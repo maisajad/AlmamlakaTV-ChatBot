@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import logging
+import os
 import re
 from functools import lru_cache
 from typing import Callable
@@ -16,10 +17,30 @@ from app.retrieval import ROOT
 load_dotenv(ROOT / ".env")
 log = logging.getLogger(__name__)
 
-MODEL = "claude-opus-5-5"
-# Server-side refusal fallback: if a safety classifier declines, the API re-runs the
-# request on Anthropic's recommended fallback model inside the same call.
+# One model per job, each the cheapest that holds up on the evals; override with env vars.
+ANSWER_MODEL = os.environ.get("ANSWER_MODEL", "claude-sonnet-5-5")      # cited answers: strict rules
+ROUTER_MODEL = os.environ.get("ROUTER_MODEL", "claude-haiku-5-5")       # classify + rewrite: short, simple
+CONFLICT_MODEL = os.environ.get("CONFLICT_MODEL", "claude-sonnet-5-5")  # offline, rare
+MODEL = ANSWER_MODEL  # the model that writes what users read
+
+# Server-side refusal fallback: if a safety classifier declines, the API re-runs the request on
+# Anthropic's recommended fallback model inside the same call. Haiku 5.5 has no fallback, and a
+# fallbacks parameter there would leave the decline in place (or 400), so it isn't sent.
 FALLBACK_BETA = "server-side-fallback-2026-07-01"
+FALLBACK_MODELS = {"claude-sonnet-5-5", "claude-opus-5-5", "claude-opus-5", "claude-fable-5-1"}
+
+
+def request_args(model: str, system: str, user_content: str, schema: dict, effort: str, max_tokens: int) -> dict:
+    args = {
+        "model": model,
+        "max_tokens": max_tokens,
+        "system": system,
+        "messages": [{"role": "user", "content": user_content}],
+        "output_config": {"effort": effort, "format": {"type": "json_schema", "schema": schema}},
+    }
+    if model in FALLBACK_MODELS:
+        args.update(betas=[FALLBACK_BETA], fallbacks="default")
+    return args
 
 
 class LLMError(Exception):
@@ -32,18 +53,11 @@ def client() -> anthropic.Anthropic:
 
 
 def structured_call(system: str, user_content: str, schema: dict, effort: str = "medium",
-                    max_tokens: int = 8000) -> dict:
+                    max_tokens: int = 8000, model: str = ANSWER_MODEL) -> dict:
     """One request whose reply is JSON matching `schema` (guaranteed by output_config.format)."""
     try:
         response = client().beta.messages.create(
-            model=MODEL,
-            max_tokens=max_tokens,
-            system=system,
-            messages=[{"role": "user", "content": user_content}],
-            output_config={"effort": effort, "format": {"type": "json_schema", "schema": schema}},
-            betas=[FALLBACK_BETA],
-            fallbacks="default",
-        )
+            **request_args(model, system, user_content, schema, effort, max_tokens))
     except anthropic.APIStatusError as e:
         log.error("Claude API error %s: %s", e.status_code, e.message)
         raise LLMError(str(e)) from e
@@ -55,18 +69,11 @@ def structured_call(system: str, user_content: str, schema: dict, effort: str = 
 
 
 def streamed_call(system: str, user_content: str, schema: dict, on_text: Callable[[str], None],
-                  effort: str = "medium", max_tokens: int = 8000) -> dict:
+                  effort: str = "medium", max_tokens: int = 8000, model: str = ANSWER_MODEL) -> dict:
     """Like structured_call, but hands each chunk of the JSON reply to `on_text` as it is generated."""
     try:
         with client().beta.messages.stream(
-            model=MODEL,
-            max_tokens=max_tokens,
-            system=system,
-            messages=[{"role": "user", "content": user_content}],
-            output_config={"effort": effort, "format": {"type": "json_schema", "schema": schema}},
-            betas=[FALLBACK_BETA],
-            fallbacks="default",
-        ) as stream:
+                **request_args(model, system, user_content, schema, effort, max_tokens)) as stream:
             for text in stream.text_stream:
                 on_text(text)
             response = stream.get_final_message()

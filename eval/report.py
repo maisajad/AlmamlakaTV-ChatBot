@@ -16,7 +16,7 @@ from pathlib import Path
 
 import yaml
 
-from app.llm import MODEL
+from app.llm import ANSWER_MODEL, ROUTER_MODEL
 from app.retrieval import ROOT
 from eval import answer_eval, conversation_eval, retrieval_eval
 
@@ -75,7 +75,7 @@ def main() -> None:
 
     report = {
         "generated": datetime.date.today().isoformat(),
-        "model": MODEL,
+        "model": f"{ANSWER_MODEL} (answers) and {ROUTER_MODEL} (routing)",
         "target": args.target,
         "summary": summary,
         "retrieval": retrieval,

@@ -59,7 +59,7 @@ def find_conflicts(chunks: list[dict], call: Callable[..., dict] = llm.structure
     from app.answer import section_label
     corpus = "\n\n".join(f'<chunk id="{c["id"]}" document="{c["doc_title"]}" section="{section_label(c)}">'
                          f'\n{c["text"]}\n</chunk>' for c in chunks)
-    result = call(CONFLICTS_SYSTEM, corpus, SCHEMA, effort="high", max_tokens=16000)
+    result = call(CONFLICTS_SYSTEM, corpus, SCHEMA, effort="high", max_tokens=16000, model=llm.CONFLICT_MODEL)
     kept = valid_for(result["conflicts"], chunks)
     dropped = [c for c in result["conflicts"] if c not in kept]
     return kept, dropped

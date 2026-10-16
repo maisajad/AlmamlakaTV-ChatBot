@@ -49,7 +49,7 @@ def rewrite(message: str, turns: list[dict], call: Callable[..., dict] = llm.str
     step still applies every rule, so this degrades follow-ups, not safety."""
     prompt = f"{render_conversation(turns)}\n\n<message>{escape(message, quote=False)}</message>"
     try:
-        raw = call(REWRITE_SYSTEM, prompt, SCHEMA, effort="low", max_tokens=2000)
+        raw = call(REWRITE_SYSTEM, prompt, SCHEMA, effort="low", max_tokens=2000, model=llm.ROUTER_MODEL)
     except llm.LLMError:
         return Rewrite("question", message)
     query = raw["standalone_query"].strip()
