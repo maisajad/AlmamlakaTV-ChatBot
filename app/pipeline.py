@@ -11,7 +11,7 @@ from app import llm
 from app.answer import Answerer, Events, no_events
 from app.language import detect_language, reply
 from app.rewrite import rewrite
-from app.sessions import SessionStore, UsageCap
+from app.sessions import make_stores
 
 log = logging.getLogger(__name__)
 
@@ -22,22 +22,27 @@ DEFAULT_HOURLY_CAP = int(os.environ.get("GLOBAL_HOURLY_LIMIT", "300"))  # ~$10-1
 
 class ChatBot:
     def __init__(self, answerer: Answerer | None = None, call: Callable[..., dict] = llm.structured_call,
-                 hourly_cap: int = DEFAULT_HOURLY_CAP):
+                 hourly_cap: int = DEFAULT_HOURLY_CAP, redis_url: str | None = None):
         self.answerer = answerer or Answerer(call=call)
         self.call = call
-        self.sessions = SessionStore()
-        self.usage = UsageCap(hourly_cap)
+        self.sessions, self.usage = make_stores(hourly_cap, redis_url)
 
     def chat(self, session_id: str | None, message: str, on_event: Events | None = None) -> dict:
         """One turn. With `on_event`, progress steps and draft text are reported while it runs."""
+        session = self.sessions.get(session_id)
+        try:
+            return self._turn(session, message, on_event)
+        finally:
+            self.sessions.save(session)  # also keeps the rate-limit timestamps of early returns
+
+    def _turn(self, session, message: str, on_event: Events | None) -> dict:
         emit = on_event or no_events
         started = time.perf_counter()
-        session = self.sessions.get(session_id)
         message = message.strip()
         language = detect_language(message, default=session.language)
         base = {"session_id": session.id, "language": language, "citations": [], "conflicts": [], "trace": None}
 
-        now = time.monotonic()
+        now = time.time()
         if session.rate_limited(now):
             return {**base, "status": "rate_limited", "answer": reply("rate_limited", language)}
         session.record_message(now)

@@ -9,9 +9,11 @@ onnxruntime==1.31.0
 sentencepiece==0.2.2
 huggingface_hub==1.33.0
 rapidfuzz==3.14.6
+redis==8.1.0
 
 # Ingestion, evals and tests
 pdfplumber==0.11.10
 PyYAML==6.0.3
 pytest==9.1.1
 httpx==0.28.1
+fakeredis==2.39.0

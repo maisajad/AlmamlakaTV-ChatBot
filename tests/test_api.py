@@ -7,6 +7,8 @@ from app import main
 class StubBot:
     """Stands in for ChatBot so the API tests need neither the model nor the network."""
 
+    kind = "memory"
+
     def __init__(self):
         self.calls, self.resets = [], []
         self.sessions = self

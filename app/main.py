@@ -79,7 +79,7 @@ def index() -> HTMLResponse:
 
 @app.get("/api/health")
 def health() -> dict:
-    return {"ok": True}
+    return {"ok": True, "sessions": app.state.bot.sessions.kind}
 
 
 @app.post("/api/chat")

@@ -8,7 +8,20 @@ services:
     envVars:
       - key: ANTHROPIC_API_KEY
         sync: false          # Render asks for the value; it is never stored in the repo
+      - key: REDIS_URL       # conversations survive the web service sleeping or restarting
+        fromService:
+          type: keyvalue
+          name: almamlaka-sessions
+          property: connectionString
       - key: GLOBAL_HOURLY_LIMIT
         value: "300"         # model-backed messages per hour across all visitors
       - key: ONNX_THREADS
         value: "1"           # the free instance has a fraction of one CPU
+
+  # Free Key Value (Valkey, Redis-compatible). It doesn't sleep with the web service; the free
+  # plan has no disk persistence, so its own (rare) restarts still clear sessions.
+  - type: keyvalue
+    name: almamlaka-sessions
+    plan: free
+    ipAllowList: []          # no public access: only Render services in the same region
+    maxmemoryPolicy: allkeys-lru
