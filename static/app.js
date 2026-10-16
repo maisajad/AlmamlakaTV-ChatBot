@@ -23,7 +23,7 @@ const I18N = {
     modeLabel: "Version",
     modeStandard: "Standard",
     modePro: "Pro RAG Chat",
-    modeProHint: "Pro: see each source highlighted in the original PDF, how every answer was found and checked, streaming replies and voice.",
+    modeProHint: "Pro: see each source highlighted in the original PDF, replies that stream as they are written, and voice.",
     showInDoc: "Show in document",
     openPdf: "Open PDF",
     close: "Close document",
@@ -59,7 +59,7 @@ const I18N = {
     modeLabel: "الإصدار",
     modeStandard: "قياسي",
     modePro: "Pro RAG Chat",
-    modeProHint: "Pro: شاهد كل مصدر مظلّلًا في ملف PDF الأصلي، وكيف وُجدت كل إجابة وتم التحقق منها، مع ردود متدفقة ودعم الصوت.",
+    modeProHint: "Pro: شاهد كل مصدر مظلّلًا في ملف PDF الأصلي، مع ردود تظهر أثناء كتابتها ودعم الصوت.",
     showInDoc: "عرض في الوثيقة",
     openPdf: "فتح ملف PDF",
     close: "إغلاق الوثيقة",
@@ -261,9 +261,6 @@ function addBotMessage(reply) {
       setTimeout(() => source.classList.remove("is-flash"), 1200);
     });
   }
-
-  const trace = window.renderTrace ? renderTrace(reply, lang) : null;  // Pro-only panel (hidden in Standard)
-  if (trace) card.append(trace);
 
   els.messages.append(el("li", { className: "msg msg-bot" }, el("div", { className: "avatar", "aria-hidden": "true" }, "م"), card));
   scrollToBottom();

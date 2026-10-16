@@ -8,7 +8,7 @@ import time
 from typing import Callable
 
 from app import llm
-from app.answer import Answerer, Events, no_events
+from app.answer import Answerer, Events
 from app.language import detect_language, reply
 from app.rewrite import rewrite
 from app.sessions import make_stores
@@ -28,7 +28,7 @@ class ChatBot:
         self.sessions, self.usage = make_stores(hourly_cap, redis_url)
 
     def chat(self, session_id: str | None, message: str, on_event: Events | None = None) -> dict:
-        """One turn. With `on_event`, progress steps and draft text are reported while it runs."""
+        """One turn. With `on_event`, the draft answer text is reported while it is written."""
         session = self.sessions.get(session_id)
         try:
             return self._turn(session, message, on_event)
@@ -36,11 +36,9 @@ class ChatBot:
             self.sessions.save(session)  # also keeps the rate-limit timestamps of early returns
 
     def _turn(self, session, message: str, on_event: Events | None) -> dict:
-        emit = on_event or no_events
-        started = time.perf_counter()
         message = message.strip()
         language = detect_language(message, default=session.language)
-        base = {"session_id": session.id, "language": language, "citations": [], "conflicts": [], "trace": None}
+        base = {"session_id": session.id, "language": language, "citations": [], "conflicts": []}
 
         now = time.time()
         if session.rate_limited(now):
@@ -55,29 +53,18 @@ class ChatBot:
             return {**base, "status": "busy", "answer": reply("busy", language)}
 
         history = list(session.turns)
-        emit({"type": "step", "step": "understand", "status": "active"})
-        t0 = time.perf_counter()
         route = rewrite(message, history, call=self.call)
-        understand_ms = round((time.perf_counter() - t0) * 1000)
         log.info("route intent=%s query=%r", route.intent, route.standalone_query)
-        emit({"type": "step", "step": "understand", "status": "done",
-              "detail": {"intent": route.intent, "understood_as": route.standalone_query}})
 
         if route.intent in ROUTED_REPLIES:
             status = ROUTED_REPLIES[route.intent]
-            result = {**base, "status": status, "answer": reply(status, language),
-                      "trace": {"retrieval": [], "known_conflicts": [], "attempts": [], "model": llm.MODEL, "timings_ms": {}}}
+            result = {**base, "status": status, "answer": reply(status, language)}
         else:
             previous = history[-1]["cited_ids"] if history else []
             result = {**base, **self.answerer.answer(message, language, standalone=route.standalone_query,
                                                      include_ids=previous, on_event=on_event)}
         result["intent"] = route.intent
         result["standalone_query"] = route.standalone_query
-        trace = result["trace"]
-        trace.update(intent=route.intent, understood_as=route.standalone_query, follow_up=bool(history),
-                     language=language)
-        trace["timings_ms"] = {"understand": understand_ms, **trace["timings_ms"],
-                               "total": round((time.perf_counter() - started) * 1000)}
 
         # Refusals and errors are remembered too: "What about the project lead?" after an
         # unanswered question still needs the earlier turn to make sense.

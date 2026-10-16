@@ -28,7 +28,7 @@ from app.retrieval import ROOT
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
 STATIC = ROOT / "static"
 DEBUG = os.environ.get("DEBUG") == "1"  # include routing/retrieval details in replies
-PUBLIC_FIELDS = ("session_id", "status", "language", "answer", "citations", "conflicts", "trace")
+PUBLIC_FIELDS = ("session_id", "status", "language", "answer", "citations", "conflicts")
 
 
 @asynccontextmanager
@@ -91,7 +91,7 @@ def chat(request: ChatRequest) -> dict:
 
 @app.post("/api/chat/stream")
 def chat_stream(request: ChatRequest) -> StreamingResponse:
-    """Server-Sent Events: progress steps and draft text while the answer is produced, then the
+    """Server-Sent Events: the draft answer text while it is written, then the
     same verified reply /api/chat returns, as a final "result" event."""
     events: queue.Queue = queue.Queue()
     done = object()
