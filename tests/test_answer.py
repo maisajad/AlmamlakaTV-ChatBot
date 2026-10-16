@@ -21,6 +21,13 @@ CONFLICTS = [{"id": "total-budget", "topic": "Total budget", "summary": "",
     ("ما هي ميزانية DEI؟", "ar"),
     ("What does ميزانية mean in this report about the Digital Expansion Initiative?", "en"),
     ("2027?", "en"),
+    # Arabizi (Arabic in Latin letters) is Arabic; English that merely looks a bit like it is not
+    ("shu el budget el kamel lal mashroo3?", "ar"),
+    ("emta el itlaq?", "ar"),
+    ("meen mas2ool el marketing?", "ar"),
+    ("What is 3D printing?", "en"),
+    ("And Q4?", "en"),
+    ("el budget", "en"),
 ])
 def test_detect_language(text, lang):
     assert detect_language(text) == lang

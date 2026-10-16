@@ -76,3 +76,22 @@
     - q: What about the project lead?
       status: [answered]
       includes: [["Sara Al-Rashid"]]
+
+- id: dialect-follow-up
+  turns:
+    - q: مين مسؤولة الامتثال بالمشروع؟
+      status: [answered]
+      includes: [["رنا", "Rana"]]
+    - q: وشو قسمها؟
+      status: [answered]
+      includes: [["Legal", "القانون", "الامتثال"]]
+      cites: [team_governance#1]
+
+- id: arabizi-follow-up
+  turns:
+    - q: meen el project lead?
+      status: [answered]
+      includes: [["سارة", "Sara"]]
+    - q: w shu el department taba3ha?
+      status: [answered]
+      includes: [["Digital Strategy", "الاستراتيجية الرقمية", "الإستراتيجية الرقمية"]]

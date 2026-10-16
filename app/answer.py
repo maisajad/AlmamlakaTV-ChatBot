@@ -14,7 +14,7 @@ from pathlib import Path
 from typing import Callable
 
 from app import llm
-from app.language import NAMES, detect_language, reply
+from app.language import NAMES, detect_language, reply, script_language
 from app.prompts import ANSWER_SYSTEM
 from app.retrieval import ROOT, Hit, Retriever, load_chunks
 from app.verify import verify
@@ -142,11 +142,11 @@ class Answerer:
                 return {**base, "status": raw["status"], "answer": reply(raw["status"], language)}
 
             verdict = verify(raw, allowed)
-            if detect_language(raw["answer"], default=language) != language:
+            if script_language(raw["answer"], default=language) != language:
                 verdict.problems.append(f"the answer must be written in {NAMES[language]}")
             for conflict in verdict.conflicts:
                 text = " ".join([conflict["topic"]] + [cl["statement"] for cl in conflict["claims"]])
-                if detect_language(text, default=language) != language:
+                if script_language(text, default=language) != language:
                     verdict.problems.append(f"conflict topics and statements must be written in {NAMES[language]}")
                     break
             if verdict.ok:

@@ -27,6 +27,9 @@ STOPWORDS = set("""
 a an and are as at be by for from has have how in is it its of on or that the this to was were what when where which
 who whom why will with does do did can should about
 """.split())
+# Every question is about this initiative, so its name carries no signal; left in, the rewritten
+# "...of the Almamlaka TV Digital Expansion Initiative" pulls in whichever sections repeat the name.
+STOPWORDS |= {"almamlaka", "tv", "digital", "expansion", "initiative", "dei"}
 
 
 def load_chunks(path: Path = CHUNKS_PATH) -> list[dict]:
@@ -109,7 +112,12 @@ class Retriever:
         hits = [Hit(self.chunks[i], float(fused[i]), best_bm25.get(i), best_dense[i]) for i in order[:k]]
 
         found = {h.chunk["id"] for h in hits}
-        wanted = set().union(*(self.related.get(h.chunk["id"], set()) for h in hits)) - found
+        # Transitive: a chunk pulled in for one conflict may hold one side of another (the Overview's
+        # "Key Details" states both the budget and the launch date), so expand until nothing new appears.
+        wanted, frontier = set(), set(found)
+        while frontier:
+            frontier = set().union(*(self.related.get(i, set()) for i in frontier)) - found - wanted
+            wanted |= frontier
         hits += [Hit(self.chunks[i], float(fused[i]), best_bm25.get(i), best_dense[i], via="related")
                  for i in order if self.chunks[i]["id"] in wanted]
 

@@ -16,7 +16,7 @@ from pathlib import Path
 
 import yaml
 
-from app.language import detect_language
+from app.language import detect_language, script_language
 from app.pipeline import ChatBot
 from eval.remote import RemoteBot
 
@@ -51,11 +51,11 @@ def check(case: dict, result: dict) -> list[str]:
     if case.get("conflict") and not result["conflicts"]:
         problems.append("no conflict flagged")
     expected_lang = detect_language(case["q"])
-    if detect_language(result["answer"]) != expected_lang:
+    if script_language(result["answer"]) != expected_lang:
         problems.append("answer is not in the question's language")
     for conflict in result["conflicts"]:
         text = " ".join([conflict["topic"]] + [cl["statement"] for cl in conflict["claims"]])
-        if detect_language(text) != expected_lang:
+        if script_language(text) != expected_lang:
             problems.append("conflict callout is not in the question's language")
             break
     return problems
