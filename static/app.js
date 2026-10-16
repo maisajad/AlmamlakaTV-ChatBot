@@ -12,7 +12,8 @@ const I18N = {
     inputLabel: "Your question",
     placeholder: "Ask a question…",
     send: "Send",
-    disclaimer: "Answers come only from 3 project documents and may contain mistakes. Check the cited sources.",
+    disclaimer: "Answers come only from the project documents and may contain mistakes. Check the cited sources.",
+    qualityLink: "Test results: try to break it",
     typing: "Searching the project documents…",
     typingSlow: "Checking the sources, almost there…",
     sources: "Sources",
@@ -48,7 +49,8 @@ const I18N = {
     inputLabel: "سؤالك",
     placeholder: "اكتب سؤالك…",
     send: "إرسال",
-    disclaimer: "الإجابات مستندة إلى 3 وثائق للمشروع فقط وقد تحتوي على أخطاء. راجع المصادر المذكورة.",
+    disclaimer: "الإجابات مستندة إلى وثائق المشروع فقط وقد تحتوي على أخطاء. راجع المصادر المذكورة.",
+    qualityLink: "نتائج الاختبار: حاول أن تخدعه",
     typing: "جارٍ البحث في وثائق المشروع…",
     typingSlow: "جارٍ التحقق من المصادر، لحظات…",
     sources: "المصادر",
@@ -334,3 +336,11 @@ for (const btn of els.modeButtons) btn.addEventListener("click", () => applyMode
 
 applyLanguage(uiLang);
 applyMode(mode);
+
+// /?q=... (used by the quality page's attack buttons) sends that question straight away.
+const preset = new URLSearchParams(location.search).get("q");
+if (preset) {
+  history.replaceState(null, "", location.pathname);  // a reload must not resend it
+  // Wait for the scripts after this one (pro.js streams Pro replies) before asking.
+  document.addEventListener("DOMContentLoaded", () => ask(preset));
+}

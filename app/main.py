@@ -60,7 +60,7 @@ async def revalidate_static(request, call_next):
     """Browsers must re-check the page and its assets on every load (cheap: ETag -> 304), so a
     new deploy is never mixed with a cached old app.js."""
     response = await call_next(request)
-    if request.url.path in ("/", "/admin") or request.url.path.startswith("/static/"):
+    if request.url.path in ("/", "/admin", "/quality") or request.url.path.startswith("/static/"):
         response.headers["Cache-Control"] = "no-cache"
     return response
 
@@ -94,6 +94,11 @@ def page(name: str) -> HTMLResponse:
 @app.get("/", include_in_schema=False)
 def index() -> HTMLResponse:
     return page("index.html")
+
+
+@app.get("/quality", include_in_schema=False)
+def quality_page() -> HTMLResponse:
+    return page("quality.html")
 
 
 @app.get("/admin", include_in_schema=False)

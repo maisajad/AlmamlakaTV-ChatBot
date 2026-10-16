@@ -52,6 +52,13 @@ def client(monkeypatch):
         yield c
 
 
+def test_quality_page_and_its_report(client):
+    page = client.get("/quality")
+    assert page.status_code == 200 and "Try to break it" in page.text
+    report = client.get("/static/quality-report.json").json()
+    assert {"summary", "cases", "conversations", "retrieval"} <= set(report)
+
+
 def test_admin_is_hidden_without_a_token(client):
     assert client.get("/admin").status_code == 404
     assert client.get("/api/admin/status").status_code == 404

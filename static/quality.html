@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Try to Break It</title>
+  <meta name="description" content="Test results for the Almamlaka TV assistant, and one-click attacks you can run yourself.">
+  <link rel="icon" type="image/png" href="/static/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body class="quality">
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="/" aria-label="Back to the assistant">
+        <img class="brand-logo" src="/static/logo.png" alt="قناة المملكة" width="119" height="35">
+        <span class="brand-divider" aria-hidden="true"></span>
+        <span class="brand-title">Quality report</span>
+      </a>
+      <a class="btn-ghost" href="/">Back to chat</a>
+    </div>
+  </header>
+
+  <main class="chat quality-main">
+    <section class="q-hero">
+      <p class="eyebrow">Almamlaka TV Assistant · Evaluation</p>
+      <h1>Try to break it</h1>
+      <p class="welcome-text" id="intro">Every answer must cite the documents, flag conflicts, refuse what the documents
+        don't cover, and ignore attempts to change its instructions. These are the automated test results, with the
+        bot's actual answers. Then attack it yourself.</p>
+    </section>
+
+    <section aria-labelledby="attack-title">
+      <h2 class="q-h2" id="attack-title">Attack it yourself</h2>
+      <p class="muted">Each button opens the chat with that message already sent.</p>
+      <div class="suggestions" id="attacks"></div>
+    </section>
+
+    <section aria-labelledby="score-title">
+      <h2 class="q-h2" id="score-title">Scorecard</h2>
+      <p class="muted" id="meta"></p>
+      <div class="q-scores" id="scores"></div>
+    </section>
+
+    <section aria-labelledby="cases-title">
+      <h2 class="q-h2" id="cases-title">Every test case</h2>
+      <div id="cases"></div>
+    </section>
+  </main>
+
+  <script src="/static/quality.js"></script>
+</body>
+</html>
