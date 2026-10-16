@@ -1,6 +1,6 @@
 """Multi-turn eval through the full pipeline. Calls the Claude API: roughly 4-6 cents per turn.
 
-    python -m eval.conversation_eval [conversation ids...]
+    python -m eval.conversation_eval [conversation ids...] [--url https://your-app.onrender.com]
 """
 
 from __future__ import annotations
@@ -14,18 +14,22 @@ from pathlib import Path
 import yaml
 
 from app.pipeline import ChatBot
+from eval.remote import RemoteBot
 from eval.answer_eval import check
 
 CASES_PATH = Path(__file__).with_name("conversation_cases.yaml")
 RESULTS_PATH = Path(__file__).with_name("conversation_results.json")
 
 
-def main(ids: list[str]) -> int:
+def main(args: list[str]) -> int:
+    url = args[args.index("--url") + 1] if "--url" in args else None
+    ids = [a for a in args if a != "--url" and a != url]
     logging.basicConfig(level=logging.WARNING, format="%(levelname)s %(name)s: %(message)s")
     conversations = yaml.safe_load(CASES_PATH.read_text(encoding="utf-8"))
     if ids:
         conversations = [c for c in conversations if c["id"] in ids]
-    bot = ChatBot()
+    bot = RemoteBot(url) if url else ChatBot()
+    print(f"target: {url or 'in-process'}")
 
     records, failed_turns, total_turns = [], 0, 0
     for convo in conversations:

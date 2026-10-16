@@ -1,6 +1,7 @@
 """Single-turn eval through the full pipeline (router + answer). Calls the Claude API: roughly 3-5 cents per case.
 
     python -m eval.answer_eval            # all cases
+    python -m eval.answer_eval --url https://your-app.onrender.com   # against a deployed instance
     python -m eval.answer_eval ceo q2-marketing   # just these ids
 """
 
@@ -17,6 +18,7 @@ import yaml
 
 from app.language import detect_language
 from app.pipeline import ChatBot
+from eval.remote import RemoteBot
 
 CASES_PATH = Path(__file__).with_name("answer_cases.yaml")
 RESULTS_PATH = Path(__file__).with_name("answer_results.json")
@@ -59,12 +61,15 @@ def check(case: dict, result: dict) -> list[str]:
     return problems
 
 
-def main(ids: list[str]) -> int:
+def main(args: list[str]) -> int:
+    url = args[args.index("--url") + 1] if "--url" in args else None
+    ids = [a for a in args if a != "--url" and a != url]
     logging.basicConfig(level=logging.WARNING, format="%(levelname)s %(name)s: %(message)s")
     cases = yaml.safe_load(CASES_PATH.read_text(encoding="utf-8"))
     if ids:
         cases = [c for c in cases if c["id"] in ids]
-    bot = ChatBot()
+    bot = RemoteBot(url) if url else ChatBot()
+    print(f"target: {url or 'in-process'}")
 
     records, failures = [], 0
     for case in cases:

@@ -5,7 +5,8 @@ Expansion Initiative** using only three project PDFs. Every answer cites its sou
 section; conflicting information is flagged rather than resolved; anything outside the documents gets
 a clear "I don't have that information".
 
-**Live demo:** _added after deployment_
+**Live demo:** https://almamlaka-assistant-hrj9.onrender.com
+(free tier: if it has been idle for 15 minutes, the first load takes about a minute to wake up)
 
 ## How it answers a message
 
@@ -66,7 +67,8 @@ The bot names those 4 and says the other 8 aren't listed.
 
 ## Evaluation
 
-Latest run: 2026-10-16, Claude Opus 5.5. Every eval goes through the same pipeline the UI uses.
+Latest run: 2026-10-17, Claude Opus 5.5, against both a local instance and the live Render
+deployment (same results). Every eval goes through the same pipeline the UI uses.
 
 | Eval | Result |
 |---|---|
@@ -127,6 +129,7 @@ Open http://localhost:7860. Set `DEBUG=1` to include routing and retrieval detai
 | `python -m eval.retrieval_eval` | Recall@k for BM25 / dense / hybrid, EN and AR | free |
 | `python -m eval.answer_eval` | Single-turn cases through the full pipeline | ~$1 |
 | `python -m eval.conversation_eval` | Multi-turn conversations | ~$1 |
+| `... --url https://…onrender.com` | Either eval against a deployed instance | same |
 | `python -m scripts.ingest` | Rebuild `data/chunks.json` from the PDFs | free |
 | `python -m scripts.build_conflicts` | Re-find conflicts (review the output before committing) | ~$0.10 |
 
