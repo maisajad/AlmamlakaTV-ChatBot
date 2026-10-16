@@ -1,0 +1,128 @@
+# Retrieval eval: each question is asked in English and Arabic.
+# A case passes when every chunk in `all_of`, and at least one chunk in `any_of`
+# (if given), is in the top-k results.
+#
+# Conflict cases list every chunk that holds one side of the conflict: the bot
+# can only flag a conflict if retrieval surfaces both sides.
+
+- id: total-budget
+  en: What is the total budget of the Digital Expansion Initiative?
+  ar: ما هي الميزانية الإجمالية لمبادرة التوسع الرقمي؟
+  all_of: [project_overview#3, budget_timeline#2]
+  note: conflict ($2.4M vs revised $2.6M)
+
+- id: launch-date
+  en: When is the public launch date?
+  ar: متى موعد الإطلاق العام للمشروع؟
+  all_of: [project_overview#3, budget_timeline#3, team_governance#3]
+  note: conflict (March 15 vs April 1, 2027)
+
+- id: q2-marketing
+  en: How much is allocated to marketing in Q2 2027?
+  ar: كم المبلغ المخصص للتسويق في الربع الثاني من عام 2027؟
+  all_of: [budget_timeline#1]
+
+- id: development-total
+  en: What is the total development budget?
+  ar: ما هي ميزانية التطوير الإجمالية؟
+  all_of: [budget_timeline#1]
+
+- id: budget-revision-reason
+  en: Why was the budget revised?
+  ar: لماذا تم تعديل الميزانية؟
+  all_of: [budget_timeline#2]
+
+- id: launch-moved-reason
+  en: Why was the launch date moved?
+  ar: لماذا تم تأجيل موعد الإطلاق؟
+  all_of: [team_governance#3]
+
+- id: lead-engineer
+  en: Who is the lead engineer?
+  ar: من هو المهندس الرئيسي في المشروع؟
+  all_of: [team_governance#1]
+
+- id: compliance-officer
+  en: Who is responsible for compliance?
+  ar: من المسؤول عن الامتثال؟
+  all_of: [team_governance#1]
+
+- id: project-lead
+  en: Who leads the project?
+  ar: من يقود المشروع؟
+  any_of: [project_overview#3, team_governance#1]
+
+- id: main-goal
+  en: What is the main goal of the project?
+  ar: ما هو الهدف الرئيسي للمشروع؟
+  all_of: [project_overview#2]
+
+- id: platforms
+  en: Which platforms does the initiative cover?
+  ar: ما هي المنصات التي تشملها المبادرة؟
+  all_of: [project_overview#4]
+
+- id: languages
+  en: How many languages will the mobile app support?
+  ar: كم عدد اللغات التي سيدعمها تطبيق الهاتف المحمول؟
+  all_of: [project_overview#4]
+
+- id: sponsor
+  en: Who sponsors the project?
+  ar: من هي الجهة الراعية للمشروع؟
+  all_of: [project_overview#5]
+
+- id: success-metrics
+  en: How will the success of the project be measured?
+  ar: كيف سيتم قياس نجاح المشروع؟
+  all_of: [project_overview#6]
+
+- id: steering-meetings
+  en: How often does the steering committee meet?
+  ar: كم مرة تجتمع اللجنة التوجيهية؟
+  all_of: [team_governance#2]
+
+- id: budget-approval
+  en: Who must approve budget changes above $50,000?
+  ar: من يجب أن يوافق على تغييرات الميزانية التي تتجاوز 50,000 دولار؟
+  all_of: [team_governance#2]
+
+- id: privacy
+  en: How is user data handled?
+  ar: كيف يتم التعامل مع بيانات المستخدمين؟
+  all_of: [team_governance#4]
+
+- id: moderation
+  en: What happens to comments that violate community standards?
+  ar: ماذا يحدث للتعليقات التي تخالف معايير المجتمع؟
+  all_of: [team_governance#5]
+
+- id: tech-escalation
+  en: Who should I contact for a technical escalation?
+  ar: بمن أتواصل لتصعيد مشكلة تقنية؟
+  all_of: [team_governance#6]
+
+- id: highest-risk
+  en: What is the highest-risk item on the timeline?
+  ar: ما هو البند الأعلى خطورة في الجدول الزمني؟
+  all_of: [budget_timeline#4]
+
+- id: design-freeze
+  en: When is the mobile app design freeze?
+  ar: متى موعد تجميد تصميم تطبيق الهاتف المحمول؟
+  all_of: [budget_timeline#3]
+
+- id: qa-window
+  en: When does QA and testing take place?
+  ar: متى تتم مرحلة ضمان الجودة والاختبار؟
+  all_of: [budget_timeline#3]
+
+- id: duration
+  en: How long will the project take?
+  ar: ما هي مدة المشروع؟
+  all_of: [project_overview#3]
+
+- id: what-is-dei
+  en: What is the Digital Expansion Initiative?
+  ar: ما هي مبادرة التوسع الرقمي؟
+  all_of: [project_overview#1]

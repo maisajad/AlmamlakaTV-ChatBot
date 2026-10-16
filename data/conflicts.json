@@ -1,0 +1,65 @@
+{
+  "conflicts": [
+    {
+      "id": "total-budget",
+      "topic": "Total project budget",
+      "summary": "The overview and the quarterly table give a total approved budget of $2,400,000. The budget notes say the Finance Committee revised the total to $2,600,000 in December 2026.",
+      "claims": [
+        {
+          "chunk_id": "project_overview#3",
+          "statement": "Total approved budget is $2,400,000.",
+          "quote": "Total Approved Budget: $2,400,000"
+        },
+        {
+          "chunk_id": "budget_timeline#1",
+          "statement": "The quarterly allocation table totals $2,400,000.",
+          "quote": "| Total | $1,700,000 | $460,000 | $240,000 | $2,400,000 |"
+        },
+        {
+          "chunk_id": "budget_timeline#2",
+          "statement": "The total budget was revised to $2,600,000 in December 2026.",
+          "quote": "the total project budget was adjusted to $2,600,000"
+        }
+      ]
+    },
+    {
+      "id": "launch-date",
+      "topic": "Public launch date",
+      "summary": "The overview and the project timeline give a launch date of March 15, 2027. The governance document says the launch was moved to April 1, 2027.",
+      "claims": [
+        {
+          "chunk_id": "project_overview#3",
+          "statement": "Planned launch date is March 15, 2027.",
+          "quote": "Planned Launch Date: March 15, 2027"
+        },
+        {
+          "chunk_id": "budget_timeline#3",
+          "statement": "The timeline lists public launch on March 15, 2027.",
+          "quote": "| Public launch | March 15, 2027 |"
+        },
+        {
+          "chunk_id": "team_governance#3",
+          "statement": "The launch date was moved to April 1, 2027.",
+          "quote": "the public launch date was moved to April 1, 2027"
+        }
+      ]
+    },
+    {
+      "id": "qa-vs-launch-sequence",
+      "topic": "QA phase overlapping launch",
+      "summary": "The timeline schedules QA and testing to run until March 20, 2027, but the public launch is March 15, 2027, so launch would happen before testing finishes.",
+      "claims": [
+        {
+          "chunk_id": "budget_timeline#3",
+          "statement": "QA and testing run from March 1 to March 20, 2027.",
+          "quote": "| QA & testing | Mar 1 - Mar 20, 2027 |"
+        },
+        {
+          "chunk_id": "budget_timeline#3",
+          "statement": "Public launch is March 15, 2027, before QA ends.",
+          "quote": "| Public launch | March 15, 2027 |"
+        }
+      ]
+    }
+  ]
+}

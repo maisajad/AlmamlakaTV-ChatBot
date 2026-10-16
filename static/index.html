@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Almamlaka TV Assistant</title>
+  <meta name="description" content="Ask questions about Almamlaka TV's Digital Expansion Initiative. Answers come only from the project documents, with sources.">
+  <meta name="theme-color" content="#9e0b0f">
+  <link rel="icon" type="image/png" href="/static/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="/" aria-label="Almamlaka TV">
+        <img class="brand-logo" src="/static/logo.png" alt="قناة المملكة" width="119" height="35">
+        <span class="brand-divider" aria-hidden="true"></span>
+        <span class="brand-title" data-i18n="title"></span>
+      </a>
+      <div class="topbar-actions">
+        <button class="btn-ghost" id="lang-toggle" type="button" data-i18n-aria="switchLanguage"></button>
+        <button class="btn-ghost" id="new-chat" type="button">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg>
+          <span data-i18n="newChat"></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="chat" id="chat">
+    <section class="welcome" id="welcome">
+      <p class="eyebrow" data-i18n="eyebrow"></p>
+      <h1 data-i18n="welcomeTitle"></h1>
+      <p class="welcome-text" data-i18n="welcomeText"></p>
+      <div class="suggestions" id="suggestions"></div>
+    </section>
+    <ol class="messages" id="messages" aria-live="polite"></ol>
+  </main>
+
+  <footer class="composer-wrap">
+    <form class="composer" id="composer">
+      <label class="visually-hidden" for="input" data-i18n="inputLabel"></label>
+      <textarea id="input" rows="1" dir="auto" maxlength="1000" autocomplete="off" data-i18n-placeholder="placeholder"></textarea>
+      <button class="send" id="send" type="submit" data-i18n-aria="send">
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M4 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+      </button>
+    </form>
+    <p class="disclaimer" data-i18n="disclaimer"></p>
+  </footer>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
