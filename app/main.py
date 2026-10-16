@@ -8,12 +8,14 @@ serves apps inside an iframe, where third-party cookies are often blocked.
 
 from __future__ import annotations
 
+import hashlib
 import logging
 import os
+import re
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
-from fastapi.responses import FileResponse
+from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
@@ -33,7 +35,19 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title="Almamlaka TV Assistant", lifespan=lifespan, docs_url=None, redoc_url=None)
+
+
+@app.middleware("http")
+async def revalidate_static(request, call_next):
+    """Browsers must re-check the page and its assets on every load (cheap: ETag -> 304), so a
+    new deploy is never mixed with a cached old app.js."""
+    response = await call_next(request)
+    if request.url.path == "/" or request.url.path.startswith("/static/"):
+        response.headers["Cache-Control"] = "no-cache"
+    return response
+
 app.mount("/static", StaticFiles(directory=STATIC), name="static")
+app.mount("/pdfs", StaticFiles(directory=ROOT / "data" / "pdfs"), name="pdfs")  # source documents for the viewer
 
 
 class ChatRequest(BaseModel):
@@ -45,9 +59,19 @@ class ResetRequest(BaseModel):
     session_id: str = Field(max_length=100)
 
 
+def asset_version() -> str:
+    """Hash of the front-end files. Stamped onto asset URLs so browsers can't keep an old copy."""
+    digest = hashlib.sha256()
+    for path in sorted(STATIC.glob("*.*")):
+        digest.update(path.read_bytes())
+    return digest.hexdigest()[:10]
+
+
 @app.get("/", include_in_schema=False)
-def index() -> FileResponse:
-    return FileResponse(STATIC / "index.html")
+def index() -> HTMLResponse:
+    html = (STATIC / "index.html").read_text(encoding="utf-8")
+    html = re.sub(r'(/static/[\w.-]+\.(?:js|css))"', rf'\1?v={asset_version()}"', html)
+    return HTMLResponse(html)
 
 
 @app.get("/api/health")

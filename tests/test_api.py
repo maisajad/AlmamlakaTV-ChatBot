@@ -34,6 +34,19 @@ def test_index_and_static_assets(client):
         assert client.get(asset).status_code == 200
 
 
+def test_assets_are_versioned_and_revalidated(client):
+    page = client.get("/")
+    assert f"/static/app.js?v={main.asset_version()}" in page.text
+    assert page.headers["cache-control"] == "no-cache"
+    assert client.get("/static/viewer.js").headers["cache-control"] == "no-cache"
+
+
+def test_source_pdfs_are_served(client):
+    pdf = client.get("/pdfs/Almamlaka_Budget_Timeline.pdf")
+    assert pdf.status_code == 200 and pdf.content.startswith(b"%PDF")
+    assert client.get("/pdfs/../.env").status_code == 404
+
+
 def test_chat_returns_only_public_fields(client):
     body = client.post("/api/chat", json={"message": "Who leads the project?"}).json()
     assert set(body) == set(main.PUBLIC_FIELDS)

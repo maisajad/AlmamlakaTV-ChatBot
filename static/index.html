@@ -30,6 +30,19 @@
     </div>
   </header>
 
+  <div class="modebar">
+    <div class="modebar-inner">
+      <div class="mode-switch" role="group" data-i18n-aria="modeLabel">
+        <button type="button" data-mode="standard" aria-pressed="true" data-i18n="modeStandard"></button>
+        <button type="button" data-mode="pro" aria-pressed="false">
+          <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path d="M12 2l2.4 7.2H22l-6.2 4.5 2.4 7.3-6.2-4.5-6.2 4.5 2.4-7.3L2 9.2h7.6z" fill="currentColor"/></svg>
+          <span data-i18n="modePro"></span>
+        </button>
+      </div>
+      <p class="mode-hint pro-only" id="mode-hint"></p>
+    </div>
+  </div>
+
   <main class="chat" id="chat">
     <section class="welcome" id="welcome">
       <p class="eyebrow" data-i18n="eyebrow"></p>
@@ -51,6 +64,22 @@
     <p class="disclaimer" data-i18n="disclaimer"></p>
   </footer>
 
+  <aside class="viewer" id="viewer" hidden aria-labelledby="viewer-title">
+    <div class="viewer-head">
+      <div class="viewer-heading">
+        <h2 id="viewer-title"></h2>
+        <p id="viewer-meta"></p>
+      </div>
+      <a class="btn-ghost" id="viewer-open" target="_blank" rel="noopener"></a>
+      <button class="btn-ghost viewer-close" id="viewer-close" type="button">
+        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg>
+      </button>
+    </div>
+    <p class="viewer-note" id="viewer-note" hidden></p>
+    <div class="viewer-body" id="viewer-body"></div>
+  </aside>
+
   <script src="/static/app.js"></script>
+  <script src="/static/viewer.js"></script>
 </body>
 </html>

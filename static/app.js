@@ -20,6 +20,16 @@ const I18N = {
     section: "Section",
     conflict: "Conflicting information in the documents",
     networkError: "Couldn't reach the assistant. Check your connection and try again.",
+    modeLabel: "Version",
+    modeStandard: "Standard",
+    modePro: "Pro RAG Chat",
+    modeProHint: "Pro: see each source highlighted in the original PDF, how every answer was found and checked, streaming replies and voice.",
+    showInDoc: "Show in document",
+    openPdf: "Open PDF",
+    close: "Close document",
+    loadingDoc: "Opening the document…",
+    quoteNotLocated: "Couldn't pinpoint the exact words on this page; showing the cited page.",
+    docError: "Couldn't load the document.",
     suggestions: [
       "What is the total budget of the initiative?",
       "When is the public launch?",
@@ -46,6 +56,16 @@ const I18N = {
     section: "القسم",
     conflict: "معلومات متعارضة بين الوثائق",
     networkError: "تعذّر الاتصال بالمساعد. تحقّق من اتصالك وحاول مجددًا.",
+    modeLabel: "الإصدار",
+    modeStandard: "قياسي",
+    modePro: "Pro RAG Chat",
+    modeProHint: "Pro: شاهد كل مصدر مظلّلًا في ملف PDF الأصلي، وكيف وُجدت كل إجابة وتم التحقق منها، مع ردود متدفقة ودعم الصوت.",
+    showInDoc: "عرض في الوثيقة",
+    openPdf: "فتح ملف PDF",
+    close: "إغلاق الوثيقة",
+    loadingDoc: "جارٍ فتح الوثيقة…",
+    quoteNotLocated: "تعذّر تحديد النص بدقة في هذه الصفحة؛ تُعرض الصفحة المذكورة.",
+    docError: "تعذّر تحميل الوثيقة.",
     suggestions: [
       "ما هي الميزانية الإجمالية للمبادرة؟",
       "متى موعد الإطلاق العام؟",
@@ -60,6 +80,7 @@ const $ = (id) => document.getElementById(id);
 const els = {
   messages: $("messages"), welcome: $("welcome"), suggestions: $("suggestions"),
   form: $("composer"), input: $("input"), send: $("send"), langToggle: $("lang-toggle"), newChat: $("new-chat"),
+  modeButtons: [...document.querySelectorAll("[data-mode]")], modeHint: $("mode-hint"),
 };
 
 const store = {
@@ -68,6 +89,9 @@ const store = {
 };
 
 let uiLang = store.get("localStorage", "uiLang") || ((navigator.language || "").startsWith("ar") ? "ar" : "en");
+// "standard" is the assignment as specified; "pro" layers on the extra features. ?mode=pro links straight to it.
+let mode = new URLSearchParams(location.search).get("mode") || store.get("localStorage", "mode") || "standard";
+const isPro = () => mode === "pro";
 // Not persisted: a reload clears the visible chat, so the server-side history must start over too.
 let sessionId = null;
 let busy = false;
@@ -84,11 +108,20 @@ function applyLanguage(lang) {
   document.querySelectorAll("[data-i18n-placeholder]").forEach((el) => { el.placeholder = t[el.dataset.i18nPlaceholder]; });
   document.querySelectorAll("[data-i18n-aria]").forEach((el) => { el.setAttribute("aria-label", t[el.dataset.i18nAria]); });
   els.langToggle.textContent = t.langButton;
+  els.modeHint.textContent = t.modeProHint;
   els.suggestions.replaceChildren(...t.suggestions.map((q) => {
     const chip = el("button", { className: "chip", type: "button", dir: "auto" }, q);
     chip.addEventListener("click", () => ask(q));
     return chip;
   }));
+}
+
+function applyMode(next) {
+  mode = next === "pro" ? "pro" : "standard";
+  store.set("localStorage", "mode", mode);
+  document.body.classList.toggle("mode-pro", isPro());
+  for (const btn of els.modeButtons) btn.setAttribute("aria-pressed", String(btn.dataset.mode === mode));
+  if (!isPro() && window.DocViewer) DocViewer.close();
 }
 
 // ---------- small DOM helpers ----------
@@ -203,11 +236,16 @@ function addBotMessage(reply) {
     }
     const sources = el("div", { className: "sources" }, el("p", { className: "sources-title" }, t.sources));
     const entryFor = {};
+    const citationFor = Object.fromEntries(reply.citations.map((c) => [c.n, c]));
     for (const { src, items } of groups.values()) {
       const entry = el("details", { className: "source" },
         el("summary", {}, el("span", { className: "source-n" }, items.map((c) => `[${c.n}]`).join("")),
                       el("span", {}, ...sourceLabel(src, t))),
-        ...items.map((c) => el("blockquote", { lang: "en" }, `“${c.quote}”`)));
+        ...items.map((c) => {
+          const show = el("button", { type: "button", className: "show-in-doc pro-only" }, t.showInDoc);
+          show.addEventListener("click", () => DocViewer.open(c, lang, show));
+          return el("div", { className: "quote-row" }, el("blockquote", { lang: "en" }, `“${c.quote}”`), show);
+        }));
       for (const c of items) entryFor[c.n] = entry;
       sources.append(entry);
     }
@@ -215,6 +253,7 @@ function addBotMessage(reply) {
     answer.addEventListener("click", (e) => {
       const btn = e.target.closest(".cite");
       if (!btn) return;
+      if (isPro()) DocViewer.open(citationFor[btn.dataset.n], lang, btn);  // Pro: straight to the highlighted page
       const source = entryFor[btn.dataset.n];
       source.open = true;
       source.scrollIntoView({ behavior: "smooth", block: "nearest" });
@@ -283,5 +322,7 @@ els.input.addEventListener("keydown", (e) => {
 });
 els.langToggle.addEventListener("click", () => applyLanguage(uiLang === "ar" ? "en" : "ar"));
 els.newChat.addEventListener("click", newChat);
+for (const btn of els.modeButtons) btn.addEventListener("click", () => applyMode(btn.dataset.mode));
 
 applyLanguage(uiLang);
+applyMode(mode);
