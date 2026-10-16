@@ -2,8 +2,10 @@
 
     uvicorn app.main:app --port 7860
 
-The session id travels in the JSON body rather than a cookie: Hugging Face Spaces
-serves apps inside an iframe, where third-party cookies are often blocked.
+The session id travels in the JSON body rather than a cookie, so the app also works when
+embedded in an iframe, where third-party cookies are often blocked.
+
+Admin (uploading PDFs) is enabled only when ADMIN_TOKEN is set.
 """
 
 from __future__ import annotations
@@ -14,16 +16,21 @@ import logging
 import os
 import queue
 import re
+import secrets
 import threading
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
-from fastapi.responses import HTMLResponse, StreamingResponse
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.concurrency import run_in_threadpool
+from fastapi.responses import FileResponse, HTMLResponse, Response, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
+from app.ingest import PDF_DIR
+from app.kb import MAX_UPLOAD_BYTES, KnowledgeBase, UploadError
 from app.pipeline import ChatBot
 from app.retrieval import ROOT
+from app.sessions import redis_client
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
 STATIC = ROOT / "static"
@@ -31,9 +38,17 @@ DEBUG = os.environ.get("DEBUG") == "1"  # include routing/retrieval details in r
 PUBLIC_FIELDS = ("session_id", "status", "language", "answer", "citations", "conflicts")
 
 
+def build_state() -> tuple[ChatBot, KnowledgeBase]:
+    """Load the knowledge base (re-ingesting if the PDFs changed) and the chat bot over it."""
+    kb = KnowledgeBase(redis=redis_client())
+    bot = ChatBot(answerer=kb.load())
+    kb.on_change = lambda answerer: setattr(bot, "answerer", answerer)  # hot-swap after uploads
+    return bot, kb
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    app.state.bot = ChatBot()  # loads chunks, conflicts and the embedding model once
+    app.state.bot, app.state.kb = build_state()
     yield
 
 
@@ -45,12 +60,11 @@ async def revalidate_static(request, call_next):
     """Browsers must re-check the page and its assets on every load (cheap: ETag -> 304), so a
     new deploy is never mixed with a cached old app.js."""
     response = await call_next(request)
-    if request.url.path == "/" or request.url.path.startswith("/static/"):
+    if request.url.path in ("/", "/admin") or request.url.path.startswith("/static/"):
         response.headers["Cache-Control"] = "no-cache"
     return response
 
 app.mount("/static", StaticFiles(directory=STATIC), name="static")
-app.mount("/pdfs", StaticFiles(directory=ROOT / "data" / "pdfs"), name="pdfs")  # source documents for the viewer
 
 
 class ChatRequest(BaseModel):
@@ -70,16 +84,79 @@ def asset_version() -> str:
     return digest.hexdigest()[:10]
 
 
-@app.get("/", include_in_schema=False)
-def index() -> HTMLResponse:
-    html = (STATIC / "index.html").read_text(encoding="utf-8")
+def page(name: str) -> HTMLResponse:
+    """A static HTML page with its asset URLs stamped with the current asset version."""
+    html = (STATIC / name).read_text(encoding="utf-8")
     html = re.sub(r'(/static/[\w.-]+\.(?:js|css))"', rf'\1?v={asset_version()}"', html)
     return HTMLResponse(html)
+
+
+@app.get("/", include_in_schema=False)
+def index() -> HTMLResponse:
+    return page("index.html")
+
+
+@app.get("/admin", include_in_schema=False)
+def admin_page() -> HTMLResponse:
+    if not os.environ.get("ADMIN_TOKEN"):
+        raise HTTPException(404)
+    return page("admin.html")
+
+
+@app.get("/pdfs/{name}", include_in_schema=False)
+def pdf(name: str) -> Response:
+    """Source documents for the viewer: committed PDFs from disk, uploaded ones from storage."""
+    if name != os.path.basename(name):
+        raise HTTPException(404)
+    path = PDF_DIR / name
+    if path.is_file():
+        return FileResponse(path, media_type="application/pdf")
+    data = app.state.kb.pdf_bytes(name)
+    if data is None:
+        raise HTTPException(404)
+    return Response(data, media_type="application/pdf")
 
 
 @app.get("/api/health")
 def health() -> dict:
     return {"ok": True, "sessions": app.state.bot.sessions.kind}
+
+
+def require_admin(request: Request) -> None:
+    token = os.environ.get("ADMIN_TOKEN")
+    if not token:
+        raise HTTPException(404)  # admin is off: don't even admit it exists
+    sent = request.headers.get("authorization", "").removeprefix("Bearer ").strip()
+    if not secrets.compare_digest(sent.encode(), token.encode()):
+        raise HTTPException(401, "Wrong admin token.")
+
+
+@app.get("/api/admin/status")
+def admin_status(request: Request) -> dict:
+    require_admin(request)
+    return app.state.kb.status()
+
+
+@app.post("/api/admin/documents")
+async def admin_upload(request: Request) -> dict:
+    """Raw PDF in the body; file name in X-Filename. Ingested and live when this returns."""
+    require_admin(request)
+    data = await request.body()
+    if len(data) > MAX_UPLOAD_BYTES:
+        raise HTTPException(413, f"PDFs can be at most {MAX_UPLOAD_BYTES // 2**20} MB.")
+    try:
+        return await run_in_threadpool(app.state.kb.add, request.headers.get("x-filename", ""), data)
+    except UploadError as e:
+        raise HTTPException(400, str(e)) from e
+
+
+@app.delete("/api/admin/documents/{name}")
+async def admin_delete(name: str, request: Request) -> dict:
+    require_admin(request)
+    try:
+        return await run_in_threadpool(app.state.kb.remove, name)
+    except UploadError as e:
+        raise HTTPException(400, str(e)) from e
 
 
 @app.post("/api/chat")

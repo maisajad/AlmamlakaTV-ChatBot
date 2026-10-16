@@ -143,16 +143,25 @@ class RedisUsageCap:
         return count <= self.per_hour
 
 
+def redis_client(url: str | None = None):
+    """A connected Redis client for REDIS_URL (or `url`), or None if unset or unreachable."""
+    url = url if url is not None else os.environ.get("REDIS_URL")
+    if not url:
+        return None
+    try:
+        import redis
+        client = redis.Redis.from_url(url, decode_responses=True, socket_timeout=3, socket_connect_timeout=3)
+        client.ping()
+        return client
+    except Exception as e:  # noqa: BLE001 - any failure here means "use memory"
+        log.warning("REDIS_URL is set but Redis is unreachable (%s); using memory instead", e)
+        return None
+
+
 def make_stores(per_hour: int, url: str | None = None):
     """(session store, usage cap) for this deployment: Redis if REDIS_URL works, else memory."""
-    url = url if url is not None else os.environ.get("REDIS_URL")
-    if url:
-        try:
-            import redis
-            client = redis.Redis.from_url(url, decode_responses=True, socket_timeout=3, socket_connect_timeout=3)
-            client.ping()
-            log.info("sessions: Redis")
-            return RedisSessionStore(client), RedisUsageCap(client, per_hour)
-        except Exception as e:  # noqa: BLE001 - any failure here means "use memory"
-            log.warning("REDIS_URL is set but Redis is unreachable (%s); keeping sessions in memory", e)
+    client = redis_client(url)
+    if client is not None:
+        log.info("sessions: Redis")
+        return RedisSessionStore(client), RedisUsageCap(client, per_hour)
     return MemorySessionStore(), UsageCap(per_hour)

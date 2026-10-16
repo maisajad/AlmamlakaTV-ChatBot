@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Knowledge Base Admin</title>
+  <link rel="icon" type="image/png" href="/static/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body class="admin">
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="/" aria-label="Back to the assistant">
+        <img class="brand-logo" src="/static/logo.png" alt="قناة المملكة" width="119" height="35">
+        <span class="brand-divider" aria-hidden="true"></span>
+        <span class="brand-title">Knowledge base admin</span>
+      </a>
+      <a class="btn-ghost" href="/">Back to chat</a>
+    </div>
+  </header>
+
+  <main class="chat admin-main">
+    <section class="admin-card" id="unlock">
+      <h1>Unlock</h1>
+      <p class="muted">Enter the admin token (the <code>ADMIN_TOKEN</code> environment variable).</p>
+      <form id="unlock-form" class="admin-row">
+        <label class="visually-hidden" for="token">Admin token</label>
+        <input id="token" type="password" autocomplete="current-password" required>
+        <button class="btn-primary" type="submit">Unlock</button>
+      </form>
+      <p class="admin-error" id="unlock-error" hidden></p>
+    </section>
+
+    <div id="panel" hidden>
+      <section class="admin-card">
+        <h2>Add a PDF</h2>
+        <p class="muted">It is checked, split into sections and searchable as soon as the upload finishes. Conflict
+          detection then reruns in the background. Max 5 MB and 40 pages; text PDFs only (no scans).</p>
+        <form id="upload-form" class="admin-row">
+          <label class="visually-hidden" for="file">PDF file</label>
+          <input id="file" type="file" accept="application/pdf,.pdf" required>
+          <button class="btn-primary" id="upload-btn" type="submit">Upload and ingest</button>
+        </form>
+        <p class="admin-note" id="upload-status" hidden></p>
+      </section>
+
+      <section class="admin-card">
+        <h2>Documents</h2>
+        <table class="admin-table">
+          <thead><tr><th>Document</th><th>File</th><th>Sections</th><th>Source</th><th></th></tr></thead>
+          <tbody id="docs"></tbody>
+        </table>
+      </section>
+
+      <section class="admin-card">
+        <h2>Conflicts <span class="badge" id="conflict-state"></span></h2>
+        <ul id="conflicts" class="admin-list"></ul>
+      </section>
+    </div>
+  </main>
+
+  <script src="/static/admin.js"></script>
+</body>
+</html>

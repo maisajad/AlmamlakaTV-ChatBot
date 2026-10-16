@@ -180,7 +180,7 @@ function renderMarkdown(text, citationCount) {
 function sourceLabel(src, t) {
   const pages = src.pages.join(", ");
   return [el("span", { className: "source-doc" }, src.doc_title),
-          el("span", { className: "source-loc" }, ` · ${t.page} ${pages} · ${t.section} ${src.section}: ${src.section_title}`)];
+          el("span", { className: "source-loc" }, ` · ${t.page} ${pages} · ${src.section ? `${t.section} ${src.section}: ` : ""}${src.section_title}`)];
 }
 
 // ---------- messages ----------

@@ -5,7 +5,7 @@ from collections import Counter
 import pdfplumber
 import pytest
 
-from scripts.ingest import OUT_PATH, PDF_DIR, build
+from app.ingest import CHUNKS_PATH as OUT_PATH, PDF_DIR, build
 
 
 @pytest.fixture(scope="module")

@@ -24,11 +24,63 @@ class StubBot:
         self.resets.append(session_id)
 
 
+class StubKB:
+    def __init__(self):
+        self.added = []
+
+    def status(self):
+        return {"documents": [], "conflicts": [], "conflict_state": "reviewed"}
+
+    def add(self, name, data):
+        if not data.startswith(b"%PDF-"):
+            raise main.UploadError("That file is not a PDF.")
+        self.added.append(name)
+        return self.status()
+
+    def remove(self, name):
+        raise main.UploadError("Only uploaded documents can be removed.")
+
+    def pdf_bytes(self, name):
+        return b"%PDF-uploaded" if name == "uploaded.pdf" else None
+
+
 @pytest.fixture
 def client(monkeypatch):
-    monkeypatch.setattr(main, "ChatBot", StubBot)
+    monkeypatch.setattr(main, "build_state", lambda: (StubBot(), StubKB()))
+    monkeypatch.delenv("ADMIN_TOKEN", raising=False)
     with TestClient(main.app) as c:
         yield c
+
+
+def test_admin_is_hidden_without_a_token(client):
+    assert client.get("/admin").status_code == 404
+    assert client.get("/api/admin/status").status_code == 404
+
+
+def test_admin_requires_the_right_token(client, monkeypatch):
+    monkeypatch.setenv("ADMIN_TOKEN", "test-admin-token")
+    assert client.get("/admin").status_code == 200
+    assert client.get("/api/admin/status").status_code == 401
+    assert client.get("/api/admin/status", headers={"Authorization": "Bearer nope"}).status_code == 401
+    ok = client.get("/api/admin/status", headers={"Authorization": "Bearer test-admin-token"})
+    assert ok.status_code == 200 and ok.json()["conflict_state"] == "reviewed"
+
+
+def test_admin_upload_passes_the_pdf_through_and_reports_errors(client, monkeypatch):
+    monkeypatch.setenv("ADMIN_TOKEN", "test-admin-token")
+    auth = {"Authorization": "Bearer test-admin-token"}
+    ok = client.post("/api/admin/documents", content=b"%PDF-1.7 ...", headers={**auth, "X-Filename": "new.pdf"})
+    assert ok.status_code == 200 and client.app.state.kb.added == ["new.pdf"]
+    bad = client.post("/api/admin/documents", content=b"not a pdf", headers={**auth, "X-Filename": "x.pdf"})
+    assert bad.status_code == 400 and bad.json()["detail"] == "That file is not a PDF."
+    too_big = client.post("/api/admin/documents", content=b"%PDF-" + b"0" * (main.MAX_UPLOAD_BYTES + 1), headers=auth)
+    assert too_big.status_code == 413
+    assert client.delete("/api/admin/documents/x.pdf", headers=auth).status_code == 400
+
+
+def test_uploaded_pdfs_are_served_too(client):
+    assert client.get("/pdfs/uploaded.pdf").content == b"%PDF-uploaded"
+    assert client.get("/pdfs/missing.pdf").status_code == 404
 
 
 def test_index_and_static_assets(client):

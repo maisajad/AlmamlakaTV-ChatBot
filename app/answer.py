@@ -7,21 +7,18 @@ unverifiable answer.
 
 from __future__ import annotations
 
-import json
 import logging
 from html import escape
-from pathlib import Path
 from typing import Callable
 
 from app import llm
 from app.language import NAMES, detect_language, reply, script_language
 from app.prompts import ANSWER_SYSTEM
-from app.retrieval import ROOT, Hit, Retriever, load_chunks
+from app.retrieval import Hit, Retriever, load_chunks
 from app.verify import verify
 
 log = logging.getLogger(__name__)
 
-CONFLICTS_PATH = ROOT / "data" / "conflicts.json"
 TOP_K = 4
 MAX_ATTEMPTS = 2
 
@@ -50,8 +47,15 @@ ANSWER_SCHEMA = {
 }
 
 
-def load_conflicts(path: Path = CONFLICTS_PATH) -> list[dict]:
-    return json.loads(path.read_text(encoding="utf-8"))["conflicts"] if path.exists() else []
+def load_conflicts() -> list[dict]:
+    from app.conflicts import load_registry
+    return load_registry()["conflicts"]
+
+
+def section_label(chunk: dict) -> str:
+    """'3. Key Details', or just 'Page 2' for chunks without a section number."""
+    title = escape(chunk["section_title"])
+    return f'{chunk["section"]}. {title}' if chunk["section"] else title
 
 
 def render_documents(hits: list[Hit]) -> str:
@@ -60,7 +64,7 @@ def render_documents(hits: list[Hit]) -> str:
         c = hit.chunk
         pages = ", ".join(map(str, c["pages"]))
         docs.append(f'<document id="{c["id"]}" source="{escape(c["doc_title"])}" page="{pages}" '
-                    f'section="{c["section"]}. {escape(c["section_title"])}">\n{c["text"]}\n</document>')
+                    f'section="{section_label(c)}">\n{c["text"]}\n</document>')
     return "<documents>\n" + "\n".join(docs) + "\n</documents>"
 
 

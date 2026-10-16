@@ -128,7 +128,7 @@ const DocViewer = (() => {
     document.body.classList.add("viewer-open");
     panel.setAttribute("dir", lang === "ar" ? "rtl" : "ltr");
     titleEl.textContent = src.doc_title;
-    metaEl.textContent = `${t.page} ${src.pages.join(", ")} · ${t.section} ${src.section}: ${src.section_title}`;
+    metaEl.textContent = `${t.page} ${src.pages.join(", ")} · ${src.section ? `${t.section} ${src.section}: ` : ""}${src.section_title}`;
     noteEl.hidden = true;
     openLink.href = `/pdfs/${encodeURIComponent(src.file)}#page=${src.pages[0]}`;
     openLink.textContent = t.openPdf;

@@ -13,6 +13,8 @@ services:
           type: keyvalue
           name: almamlaka-sessions
           property: connectionString
+      - key: ADMIN_TOKEN     # unlocks /admin (upload PDFs); Render generates it, see the dashboard
+        generateValue: true
       - key: GLOBAL_HOURLY_LIMIT
         value: "300"         # model-backed messages per hour across all visitors
       - key: ONNX_THREADS
