@@ -17,7 +17,7 @@ const I18N = {
     typingSlow: "Checking the sources, almost there…",
     sources: "Sources",
     page: "p.",
-    section: "§",
+    section: "Section",
     conflict: "Conflicting information in the documents",
     networkError: "Couldn't reach the assistant. Check your connection and try again.",
     suggestions: [
@@ -147,7 +147,7 @@ function renderMarkdown(text, citationCount) {
 function sourceLabel(src, t) {
   const pages = src.pages.join(", ");
   return [el("span", { className: "source-doc" }, src.doc_title),
-          el("span", { className: "source-loc" }, ` · ${t.page} ${pages} · ${t.section} ${src.section} ${src.section_title}`)];
+          el("span", { className: "source-loc" }, ` · ${t.page} ${pages} · ${t.section} ${src.section}: ${src.section_title}`)];
 }
 
 // ---------- messages ----------
