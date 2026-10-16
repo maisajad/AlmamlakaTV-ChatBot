@@ -9,13 +9,16 @@ serves apps inside an iframe, where third-party cookies are often blocked.
 from __future__ import annotations
 
 import hashlib
+import json
 import logging
 import os
+import queue
 import re
+import threading
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
@@ -25,7 +28,7 @@ from app.retrieval import ROOT
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
 STATIC = ROOT / "static"
 DEBUG = os.environ.get("DEBUG") == "1"  # include routing/retrieval details in replies
-PUBLIC_FIELDS = ("session_id", "status", "language", "answer", "citations", "conflicts")
+PUBLIC_FIELDS = ("session_id", "status", "language", "answer", "citations", "conflicts", "trace")
 
 
 @asynccontextmanager
@@ -84,6 +87,33 @@ def chat(request: ChatRequest) -> dict:
     # A sync endpoint: FastAPI runs it in a worker thread, so slow model calls don't block the loop.
     result = app.state.bot.chat(request.session_id, request.message)
     return result if DEBUG else {k: result[k] for k in PUBLIC_FIELDS}
+
+
+@app.post("/api/chat/stream")
+def chat_stream(request: ChatRequest) -> StreamingResponse:
+    """Server-Sent Events: progress steps and draft text while the answer is produced, then the
+    same verified reply /api/chat returns, as a final "result" event."""
+    events: queue.Queue = queue.Queue()
+    done = object()
+
+    def run() -> None:
+        try:
+            result = app.state.bot.chat(request.session_id, request.message, on_event=events.put)
+            events.put({"type": "result", "reply": result if DEBUG else {k: result[k] for k in PUBLIC_FIELDS}})
+        except Exception:  # never leave the client hanging on a broken stream
+            logging.getLogger(__name__).exception("stream failed")
+            events.put({"type": "error"})
+        finally:
+            events.put(done)
+
+    threading.Thread(target=run, daemon=True).start()
+
+    def sse():
+        while (event := events.get()) is not done:
+            yield f"data: {json.dumps(event, ensure_ascii=False)}\n\n"
+
+    return StreamingResponse(sse(), media_type="text/event-stream",
+                             headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"})
 
 
 @app.post("/api/reset")

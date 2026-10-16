@@ -138,6 +138,30 @@ def test_global_hourly_cap_applies_across_sessions(retriever):
     assert third["status"] == "busy" and third["answer"] == reply("busy", "ar")
 
 
+def test_streaming_reports_steps_and_drafts_that_add_up_to_the_answer(retriever):
+    import json
+
+    def fake_stream(system, user_content, schema, on_text, **kwargs):
+        raw = json.dumps(ENGINEER)
+        for i in range(0, len(raw), 7):  # arbitrary chunking, like real token deltas
+            on_text(raw[i:i + 7])
+        return ENGINEER
+
+    model = FakeModel(routes=[route("question", "Who is the lead engineer?")])
+    answerer = Answerer(retriever=retriever, conflicts=[], call=model, stream_call=fake_stream)
+    bot = ChatBot(answerer=answerer, call=model)
+    events = []
+    result = bot.chat(None, "Who is the lead engineer?", on_event=events.append)
+
+    steps = [(e["step"], e["status"]) for e in events if e["type"] == "step"]
+    assert steps == [("understand", "active"), ("understand", "done"), ("search", "active"), ("search", "done"),
+                     ("write", "active"), ("write", "done"), ("verify", "active"), ("verify", "done")]
+    assert "".join(e["delta"] for e in events if e["type"] == "draft") == result["answer"] == ENGINEER["answer"]
+    trace = result["trace"]
+    assert trace["understood_as"] == "Who is the lead engineer?" and trace["attempts"][0]["problems"] == []
+    assert {"understand", "search", "answer", "total"} <= set(trace["timings_ms"])
+
+
 def test_unknown_session_id_gets_a_fresh_session(retriever):
     bot, _ = make(retriever, routes=[route("greeting")])
     assert bot.chat("forged-id", "hi")["session_id"] != "forged-id"

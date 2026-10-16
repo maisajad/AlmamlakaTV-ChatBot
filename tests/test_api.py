@@ -11,10 +11,14 @@ class StubBot:
         self.calls, self.resets = [], []
         self.sessions = self
 
-    def chat(self, session_id, message):
+    def chat(self, session_id, message, on_event=None):
         self.calls.append((session_id, message))
+        if on_event:
+            on_event({"type": "step", "step": "understand", "status": "active"})
+            on_event({"type": "draft", "delta": "Hi", "attempt": 1})
         return {"session_id": session_id or "new-id", "status": "answered", "language": "en", "answer": "Hi [1].",
-                "citations": [], "conflicts": [], "retrieved": ["x"], "intent": "question", "standalone_query": message}
+                "citations": [], "conflicts": [], "trace": {"model": "m"}, "retrieved": ["x"], "intent": "question",
+                "standalone_query": message}
 
     def reset(self, session_id):
         self.resets.append(session_id)
@@ -51,6 +55,15 @@ def test_chat_returns_only_public_fields(client):
     body = client.post("/api/chat", json={"message": "Who leads the project?"}).json()
     assert set(body) == set(main.PUBLIC_FIELDS)
     assert body["session_id"] == "new-id"
+
+
+def test_stream_sends_steps_drafts_then_the_public_reply(client):
+    import json
+    response = client.post("/api/chat/stream", json={"message": "Who leads the project?"})
+    assert response.headers["content-type"].startswith("text/event-stream")
+    events = [json.loads(line[len("data: "):]) for line in response.text.splitlines() if line.startswith("data: ")]
+    assert [e["type"] for e in events] == ["step", "draft", "result"]
+    assert set(events[-1]["reply"]) == set(main.PUBLIC_FIELDS)
 
 
 def test_chat_passes_the_session_id_through(client):

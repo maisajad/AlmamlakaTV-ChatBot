@@ -262,6 +262,9 @@ function addBotMessage(reply) {
     });
   }
 
+  const trace = window.renderTrace ? renderTrace(reply, lang) : null;  // Pro-only panel (hidden in Standard)
+  if (trace) card.append(trace);
+
   els.messages.append(el("li", { className: "msg msg-bot" }, el("div", { className: "avatar", "aria-hidden": "true" }, "م"), card));
   scrollToBottom();
 }
@@ -276,15 +279,23 @@ async function ask(question) {
   addUserMessage(question);
   els.input.value = "";
   autosize();
-  const stopTyping = addTyping();
+  let stopTyping = () => {};
   try {
-    const res = await fetch("/api/chat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: question, session_id: sessionId }),
-    });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const reply = await res.json();
+    // Pro streams with live steps; Standard waits for the complete reply behind a typing indicator.
+    const live = isPro() ? createLiveCard(guessLanguage(question)) : null;
+    stopTyping = live ? () => live.remove() : addTyping();
+    let reply;
+    if (live) {
+      reply = await streamReply(question, live);
+    } else {
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: question, session_id: sessionId }),
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      reply = await res.json();
+    }
     sessionId = reply.session_id;
     stopTyping();
     addBotMessage(reply);

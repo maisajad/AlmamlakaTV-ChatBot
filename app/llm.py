@@ -4,7 +4,9 @@ from __future__ import annotations
 
 import json
 import logging
+import re
 from functools import lru_cache
+from typing import Callable
 
 import anthropic
 from dotenv import load_dotenv
@@ -49,13 +51,89 @@ def structured_call(system: str, user_content: str, schema: dict, effort: str = 
         log.error("Claude API unreachable: %s", e)
         raise LLMError(str(e)) from e
 
-    log.info("claude %s stop=%s in=%s out=%s", response._request_id, response.stop_reason,
+    return parse_reply(response, getattr(response, "_request_id", None))
+
+
+def streamed_call(system: str, user_content: str, schema: dict, on_text: Callable[[str], None],
+                  effort: str = "medium", max_tokens: int = 8000) -> dict:
+    """Like structured_call, but hands each chunk of the JSON reply to `on_text` as it is generated."""
+    try:
+        with client().beta.messages.stream(
+            model=MODEL,
+            max_tokens=max_tokens,
+            system=system,
+            messages=[{"role": "user", "content": user_content}],
+            output_config={"effort": effort, "format": {"type": "json_schema", "schema": schema}},
+            betas=[FALLBACK_BETA],
+            fallbacks="default",
+        ) as stream:
+            for text in stream.text_stream:
+                on_text(text)
+            response = stream.get_final_message()
+    except anthropic.APIStatusError as e:
+        log.error("Claude API error %s: %s", e.status_code, e.message)
+        raise LLMError(str(e)) from e
+    except anthropic.APIConnectionError as e:
+        log.error("Claude API unreachable: %s", e)
+        raise LLMError(str(e)) from e
+    return parse_reply(response, None)
+
+
+def parse_reply(response, request_id: str | None) -> dict:
+    log.info("claude %s stop=%s in=%s out=%s", request_id or response.id, response.stop_reason,
              response.usage.input_tokens, response.usage.output_tokens)
     if response.stop_reason == "refusal":
         raise LLMError(f"refused: {response.stop_details}")
     if response.stop_reason == "max_tokens":
         raise LLMError("hit max_tokens")
-    text = next((b.text for b in response.content if b.type == "text"), None)
-    if text is None:
+    # If a fallback model took over mid-reply, the last text block holds its complete answer.
+    texts = [b.text for b in response.content if b.type == "text"]
+    if not texts:
         raise LLMError("no text block in response")
-    return json.loads(text)
+    try:
+        return json.loads(texts[-1])
+    except json.JSONDecodeError as e:
+        raise LLMError(f"reply is not valid JSON: {e}") from e
+
+
+class JsonFieldStreamer:
+    """Pulls one top-level string field (e.g. "answer") out of a JSON object while it is still
+    being generated, decoding escapes as they complete. feed() returns the text decoded so far."""
+
+    ESCAPES = {'"': '"', "\\": "\\", "/": "/", "b": "\b", "f": "\f", "n": "\n", "r": "\r", "t": "\t"}
+
+    def __init__(self, field: str):
+        self.key = re.compile(r'"%s"\s*:\s*"' % re.escape(field))
+        self.raw = ""
+        self.pos: int | None = None  # index in raw where the string value starts
+        self.value = ""
+        self.done = False
+
+    def feed(self, chunk: str) -> str:
+        self.raw += chunk
+        if self.pos is None:
+            match = self.key.search(self.raw)
+            if not match:
+                return self.value
+            self.pos = match.end()
+        while not self.done and self.pos < len(self.raw):
+            ch = self.raw[self.pos]
+            if ch == '"':
+                self.done = True
+            elif ch == "\\":
+                if self.pos + 1 >= len(self.raw):
+                    break  # escape not complete yet
+                nxt = self.raw[self.pos + 1]
+                if nxt == "u":
+                    if self.pos + 6 > len(self.raw):
+                        break
+                    self.value += chr(int(self.raw[self.pos + 2:self.pos + 6], 16))
+                    self.pos += 6
+                    continue
+                self.value += self.ESCAPES.get(nxt, nxt)
+                self.pos += 2
+                continue
+            else:
+                self.value += ch
+            self.pos += 1
+        return self.value
