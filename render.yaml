@@ -1,0 +1,14 @@
+# Render Blueprint: Dashboard -> New -> Blueprint -> pick this repo.
+services:
+  - type: web
+    name: almamlaka-assistant
+    runtime: docker
+    plan: free
+    healthCheckPath: /api/health
+    envVars:
+      - key: ANTHROPIC_API_KEY
+        sync: false          # Render asks for the value; it is never stored in the repo
+      - key: GLOBAL_HOURLY_LIMIT
+        value: "300"         # model-backed messages per hour across all visitors
+      - key: ONNX_THREADS
+        value: "1"           # the free instance has a fraction of one CPU

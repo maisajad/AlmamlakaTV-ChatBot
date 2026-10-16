@@ -1,7 +1,7 @@
 """Hybrid retrieval over the section chunks.
 
 BM25 is good at exact figures and names ("$50,000", "Omar Fayez"); multilingual
-embeddings handle paraphrases and Arabic questions against English text. The
+embeddings (app/embeddings.py) handle paraphrases and Arabic questions against English text. The
 two rankings are merged with reciprocal rank fusion (RRF), which only looks at
 ranks, so the two very different score scales never have to be calibrated.
 
@@ -21,7 +21,6 @@ from rank_bm25 import BM25Okapi
 ROOT = Path(__file__).resolve().parent.parent
 CHUNKS_PATH = ROOT / "data" / "chunks.json"
 
-EMBEDDING_MODEL = "intfloat/multilingual-e5-small"
 RRF_K = 60  # standard RRF damping constant
 
 STOPWORDS = set("""
@@ -65,8 +64,8 @@ class Retriever:
                 self.related.setdefault(chunk_id, set()).update(set(group) - {chunk_id})
         self.bm25 = BM25Okapi([tokenize(index_text(c)) for c in chunks])
         if model is None:
-            from sentence_transformers import SentenceTransformer
-            model = SentenceTransformer(EMBEDDING_MODEL)
+            from app.embeddings import OnnxEmbedder
+            model = OnnxEmbedder()
         self.model = model
         # e5 models expect "passage: " / "query: " prefixes.
         self.embeddings = self._embed([f"passage: {index_text(c)}" for c in chunks])

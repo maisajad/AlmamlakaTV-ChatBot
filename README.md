@@ -1,14 +1,3 @@
----
-title: Almamlaka TV Assistant
-emoji: 📺
-colorFrom: red
-colorTo: gray
-sdk: docker
-app_port: 7860
-pinned: false
-short_description: Bilingual RAG assistant for Almamlaka TV project documents
----
-
 # Almamlaka TV Assistant
 
 A bilingual (Arabic / English) RAG chatbot that answers questions about Almamlaka TV's **Digital
@@ -62,7 +51,7 @@ message ─► guard ─► rewrite ─► retrieve ─► answer ─► verify 
 | Replies in the user's language | Script-based language detection per message; checked on output, retried if wrong; RTL UI |
 | Resists prompt injection | Router classifies injections; user text and documents are tagged as data; the model has no tools; uncited output is dropped |
 | Almamlaka TV branding | Logo and palette (`#9e0b0f`, `#1b2431`, `#343434`) taken from almamlakatv.com; Arabic/English UI |
-| Live deployment | Hugging Face Spaces (Docker) |
+| Live deployment | Render (Docker, free tier) |
 
 ## Known conflicts in the documents
 
@@ -84,7 +73,7 @@ Latest run: 2026-10-16, Claude Opus 5.5. Every eval goes through the same pipeli
 | Retrieval, recall@4 (24 questions × EN/AR) | hybrid **24/24 EN, 24/24 AR** (BM25 alone: 24/24 EN, 2/24 AR; dense alone: 24/24 both) |
 | Single-turn answers (`eval/answer_cases.yaml`) | **23/23** |
 | Multi-turn conversations (`eval/conversation_cases.yaml`) | **17/17 turns** across 7 conversations |
-| Unit tests (fake model, no API calls) | **45/45** |
+| Tests (`pytest`, incl. the real-embedding recall test; no API calls) | **47/47** |
 
 What the cases cover:
 
@@ -103,6 +92,20 @@ What the cases cover:
 
 Retrieval alone can miss one side of a conflict (at k=3 the short "Key Details" section drops out
 of the budget and launch-date results). That is why conflict groups pull in every side explicitly.
+
+## Fitting in 512 MB
+
+The free Render instance has 512 MB of RAM. The usual stack (torch + sentence-transformers) needs
+more than that before the app even starts, so embeddings run differently here:
+
+- **ONNX Runtime instead of torch**, with the model's official int8-quantized export (118 MB).
+  Its embeddings match the original model's (cosine 0.993–0.997), and retrieval recall is unchanged.
+- **SentencePiece instead of the `tokenizers` library.** `tokenizers` expands the 250k-token
+  vocabulary to about 250 MB of RAM; SentencePiece uses about 40 MB and produces identical token
+  ids (checked on every chunk plus Arabic, mixed-script and emoji text).
+
+Measured with real chat traffic: **about 300 MB steady, 377 MB peak** (the peak is the one-time
+embedding of the 16 chunks at startup).
 
 ## Run it locally
 
@@ -150,7 +153,9 @@ tests/           unit tests (no API calls)
 
 ## Limitations
 
-- Sessions live in memory: a restart (e.g. a sleeping Space waking up) starts every conversation over.
+- Sessions live in memory: a restart starts every conversation over.
+- On Render's free tier the service sleeps after 15 minutes without traffic; the first visit after
+  that takes about a minute while it wakes up.
 - Each reply takes about 5–14 seconds (two model calls; the answer step thinks before it answers).
 - Language detection is script-based: Arabic written in Latin letters ("Arabizi") is treated as English.
 - The conflict registry is built offline. New or changed documents need `scripts.ingest` and
