@@ -111,6 +111,7 @@ function applyLanguage(lang) {
   document.querySelectorAll("[data-i18n-aria]").forEach((el) => { el.setAttribute("aria-label", t[el.dataset.i18nAria]); });
   els.langToggle.textContent = t.langButton;
   els.modeHint.textContent = t.modeProHint;
+  if (typeof Voice !== "undefined") Voice.relabel();
   els.suggestions.replaceChildren(...t.suggestions.map((q) => {
     const chip = el("button", { className: "chip", type: "button", dir: "auto" }, q);
     chip.addEventListener("click", () => ask(q));
@@ -123,7 +124,7 @@ function applyMode(next) {
   store.set("localStorage", "mode", mode);
   document.body.classList.toggle("mode-pro", isPro());
   for (const btn of els.modeButtons) btn.setAttribute("aria-pressed", String(btn.dataset.mode === mode));
-  if (!isPro() && window.DocViewer) DocViewer.close();
+  if (!isPro() && typeof DocViewer !== "undefined") DocViewer.close();
 }
 
 // ---------- small DOM helpers ----------
@@ -263,6 +264,8 @@ function addBotMessage(reply) {
       setTimeout(() => source.classList.remove("is-flash"), 1200);
     });
   }
+
+  if (typeof Voice !== "undefined") Voice.decorate(card, reply, lang);  // Pro: "Listen" button
 
   els.messages.append(el("li", { className: "msg msg-bot" }, el("div", { className: "avatar", "aria-hidden": "true" }, "م"), card));
   scrollToBottom();

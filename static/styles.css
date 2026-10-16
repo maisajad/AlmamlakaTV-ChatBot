@@ -201,6 +201,7 @@ button, textarea { font: inherit; color: inherit; }
 
 /* ---------- Standard / Pro switch ---------- */
 .pro-only { display: none !important; }
+[hidden] { display: none !important; }  /* beats .pro-only and component display rules */
 body.mode-pro .pro-only { display: revert !important; }
 .modebar { border-bottom: 1px solid var(--line); background: var(--surface); }
 .modebar-inner {
@@ -319,3 +320,21 @@ a.btn-ghost { text-decoration: none; color: var(--ink); }
 .q-cite-label { display: block; font-weight: 600; color: var(--ink-2); }
 .q-cites q { direction: ltr; unicode-bidi: isolate; }
 .disclaimer a { color: var(--brand); font-weight: 600; white-space: nowrap; }
+
+/* ---------- voice (Pro) ---------- */
+.mic {
+  flex: none; width: 40px; height: 40px; border-radius: 12px; border: 1px solid var(--line); cursor: pointer;
+  background: transparent; color: var(--brand); display: grid; place-items: center;
+}
+.mic:hover { border-color: var(--brand); }
+.mic.is-listening { background: var(--brand); color: #fff; border-color: var(--brand); animation: pulse 1.2s ease-in-out infinite; }
+@keyframes pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(158, 11, 15, .45); } 50% { box-shadow: 0 0 0 8px rgba(158, 11, 15, 0); } }
+@media (prefers-reduced-motion: reduce) { .mic.is-listening { animation: none; } }
+.listen {
+  margin-top: 10px; border: 1px solid var(--line); background: transparent; border-radius: 999px; cursor: pointer;
+  padding: 3px 12px 3px 10px; font-size: 13px; font-weight: 600; color: var(--muted);
+}
+.listen::before { content: "🔊 "; }
+.listen.is-speaking { color: var(--brand); border-color: var(--brand); }
+.listen.is-speaking::before { content: "⏹ "; }
+.mic:focus-visible, .listen:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
