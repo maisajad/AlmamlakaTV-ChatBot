@@ -20,7 +20,7 @@ MODEL_REPO = "intfloat/multilingual-e5-small"
 ONNX_FILE = "onnx/model_qint8_avx512_vnni.onnx"
 SPM_FILE = "sentencepiece.bpe.model"
 MAX_TOKENS = 512
-BATCH_SIZE = 8
+BATCH_SIZE = 1  # one text at a time keeps activation memory small on a 512 MB instance
 # XLM-RoBERTa ids: SentencePiece ids shifted by one, its <unk> (0) mapped to 3,
 # and every sequence wrapped in <s> ... </s>.
 BOS, PAD, EOS, UNK = 0, 1, 2, 3
@@ -28,6 +28,7 @@ BOS, PAD, EOS, UNK = 0, 1, 2, 3
 
 class OnnxEmbedder:
     def __init__(self, repo: str = MODEL_REPO, onnx_file: str = ONNX_FILE):
+        self.cache_id = f"{repo}/{onnx_file}"  # identifies vectors this model produced
         import onnxruntime as ort
         import sentencepiece as spm
         from huggingface_hub import hf_hub_download

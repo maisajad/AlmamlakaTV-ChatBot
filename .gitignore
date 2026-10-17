@@ -5,3 +5,4 @@ __pycache__/
 .pytest_cache/
 eval/*_results.json
 .claude/
+data/embeddings.npz

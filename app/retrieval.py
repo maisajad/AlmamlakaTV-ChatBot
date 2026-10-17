@@ -70,8 +70,11 @@ class Retriever:
             from app.embeddings import OnnxEmbedder
             model = OnnxEmbedder()
         self.model = model
-        # e5 models expect "passage: " / "query: " prefixes.
-        self.embeddings = self._embed([f"passage: {index_text(c)}" for c in chunks])
+        # e5 models expect "passage: " / "query: " prefixes. Vectors come from the cache built into
+        # the image when possible; only new text (e.g. an uploaded PDF) is embedded here.
+        from app.embedding_cache import embed_passages
+        self.embeddings = embed_passages([f"passage: {index_text(c)}" for c in chunks], self._embed,
+                                         getattr(model, "cache_id", None))
 
     def _embed(self, texts: list[str]) -> np.ndarray:
         return self.model.encode(texts, normalize_embeddings=True, convert_to_numpy=True)

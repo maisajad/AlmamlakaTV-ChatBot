@@ -3,11 +3,17 @@ FROM python:3.12-slim
 
 RUN useradd -m -u 1000 user
 USER user
+# A 512 MB instance on a many-core host: native libraries size thread pools and per-thread buffers
+# by the host's core count, and glibc grows one malloc arena per thread. Pin all of it low.
 ENV HOME=/home/user \
     PATH=/home/user/.local/bin:$PATH \
     PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
-    HF_HOME=/home/user/.cache/huggingface
+    HF_HOME=/home/user/.cache/huggingface \
+    MALLOC_ARENA_MAX=2 \
+    ONNX_THREADS=1 \
+    OMP_NUM_THREADS=1 \
+    OPENBLAS_NUM_THREADS=1
 WORKDIR /home/user/app
 
 COPY --chown=user requirements.txt .
@@ -19,6 +25,8 @@ RUN python -c "import app.embeddings as e; e.OnnxEmbedder()"
 ENV HF_HUB_OFFLINE=1
 
 COPY --chown=user . .
+# Embed the chunks now, not at startup: the startup spike was enough to exceed 512 MB.
+RUN python -m app.embedding_cache
 
 # Render (and most hosts) pass the port in $PORT.
 EXPOSE 7860

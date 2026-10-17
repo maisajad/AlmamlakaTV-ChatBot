@@ -46,9 +46,32 @@ def build_state() -> tuple[ChatBot, KnowledgeBase]:
     return bot, kb
 
 
+def log_memory(stage: str) -> None:
+    """Startup memory in the host's logs: the free instance is killed above 512 MB."""
+    try:
+        import resource  # Unix only
+        peak_mb = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024  # KB on Linux
+        with open("/proc/self/status") as f:
+            rss_mb = next(int(line.split()[1]) for line in f if line.startswith("VmRSS")) / 1024
+        logging.getLogger(__name__).info("memory %s: %.0f MB now, %.0f MB peak", stage, rss_mb, peak_mb)
+    except (ImportError, OSError, StopIteration):
+        pass
+
+
+def release_freed_memory() -> None:
+    """Return heap freed during startup (the model load's temporary buffers) to the OS."""
+    try:
+        import ctypes
+        ctypes.CDLL("libc.so.6").malloc_trim(0)
+    except OSError:  # not glibc (Windows, macOS)
+        pass
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     app.state.bot, app.state.kb = build_state()
+    release_freed_memory()
+    log_memory("after startup")
     yield
 
 
