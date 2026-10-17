@@ -71,6 +71,8 @@ message ─► guard ─► rewrite ─► retrieve ─► answer ─► verify 
   web service restarting.
 - **"Try to break it" page (`/quality`):** every eval case with the bot's actual answer,
   and one-click attacks.
+- **Access codes:** set `ACCESS_TOKENS` and the chat, the source PDFs and the test report ask for a
+  code first (one per person, so access can be revoked individually); unset, the assistant is open.
 
 ## Known conflicts in the documents
 
@@ -95,7 +97,7 @@ pipeline the UI uses. The full results, with every answer, are on the
 | Retrieval, recall@4 (24 questions × EN/AR) | hybrid **24/24 EN, 24/24 AR** (BM25 alone 23/24 EN, 2/24 AR; embeddings alone 24/24 both) |
 | Single-turn answers (`eval/answer_cases.yaml`) | **30/30** |
 | Multi-turn conversations (`eval/conversation_cases.yaml`) | **21/21 turns** across 9 conversations |
-| Unit tests (`pytest`, no API calls) | **88/88** |
+| Unit tests (`pytest`, no API calls) | **95/95** |
 
 | Category | Passed | What it covers |
 |---|---|---|
@@ -120,7 +122,18 @@ The free Render instance has 512 MB of RAM, and torch + sentence-transformers al
 - **SentencePiece instead of the `tokenizers` library**, which alone took ~250 MB for the 250k-token
   vocabulary. SentencePiece uses ~40 MB and gives identical token ids.
 
-Measured with real chat traffic: **~300 MB steady, 377 MB peak**.
+Measured locally with real chat traffic: **~290 MB steady, about 350–365 MB peak**, the peak being
+the model load. On Render's Linux the same startup once went over 512 MB and the instance was killed,
+so the image also:
+
+- **embeds the chunks at build time** (`python -m app.embedding_cache`, cached in the image and tagged
+  with the model), so startup runs no inference; only text without a cached vector, such as an
+  uploaded PDF, is embedded at runtime, one passage at a time;
+- **pins thread pools to one** (`ONNX_THREADS`, `OMP_NUM_THREADS`, `OPENBLAS_NUM_THREADS`) and sets
+  `MALLOC_ARENA_MAX=2`: native libraries otherwise size threads and per-thread buffers by the host's
+  core count;
+- **returns memory freed during startup to the OS** and logs a `memory after startup: … MB now, … MB peak`
+  line, so the real number is visible in Render's logs.
 
 ## Deploy
 
@@ -137,6 +150,12 @@ instance (Redis-compatible), reachable only from Render's private network.
 
 Pushing to `main` redeploys. Asset URLs carry a content hash, so browsers never mix a new deploy with
 cached old scripts.
+
+**Changing a token:** Render → the service → **Environment** → edit `ADMIN_TOKEN` or `ACCESS_TOKENS` →
+**Save Changes**. Render redeploys in about a minute and the old value stops working. Codes can be any
+readable text in English letters, digits and symbols (no commas, case-sensitive); since wrong attempts
+aren't rate-limited, use a few words joined together, such as `blue-falcon-review-2026`. To generate one:
+`python -c "import secrets; print(secrets.token_urlsafe(16))"`.
 
 ## Run it locally
 
@@ -175,6 +194,7 @@ app/
   verify.py      Citation and quote checks
   retrieval.py   BM25 + embeddings + RRF + conflict groups
   embeddings.py  multilingual-e5-small on ONNX Runtime + SentencePiece
+  embedding_cache.py  Chunk embeddings computed at image build time
   ingest.py      PDFs → section chunks
   conflicts.py   Conflict detection and the registry
   kb.py          Current knowledge base: auto re-ingest, uploads, hot swap
@@ -182,8 +202,9 @@ app/
   llm.py         The only module that calls the Claude API
   prompts.py     System prompts
   language.py    Language and Arabizi detection, fixed bilingual replies
-static/          chat UI, Pro (viewer, streaming, voice), quality and admin pages
-data/            pdfs/, chunks.json, conflicts.json
+static/          chat UI (app.js), streaming (pro.js), PDF viewer, voice, access codes (auth.js),
+                 quality and admin pages
+data/            pdfs/, chunks.json, conflicts.json, quality-report.json
 scripts/         ingest.py, build_conflicts.py
 eval/            retrieval / answer / conversation evals, cases, report
 docs/            DECISIONS.md, DEMO_SCRIPT.md
@@ -192,9 +213,10 @@ tests/           unit tests (no API calls)
 
 ## Limitations
 
-- Each reply takes about 3–8 seconds (two model calls); Pro's streaming shows the first words sooner.
+- Each reply takes about 3–8 seconds (two model calls); streaming shows the first words sooner.
 - The free Key Value instance keeps data in memory only; its own (rare) restarts clear sessions and
   uploads. A paid tier adds disk persistence.
 - Uploaded PDFs must contain text (no OCR), up to 5 MB and 40 pages. Conflicts detected for uploads go
   live without human review.
 - Dictation and read-aloud depend on the browser: best in Chrome and Edge.
+- Wrong access codes aren't rate-limited, so codes should be long enough not to be guessed.

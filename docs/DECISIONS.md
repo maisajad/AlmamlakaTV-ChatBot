@@ -50,7 +50,9 @@ has no tools, so the worst case is a refusal.
 
 torch alone exceeds 512 MB, so embeddings run on ONNX Runtime with the model's official int8 export
 (cosine 0.993–0.997 vs the original, identical recall), and tokenization uses SentencePiece directly
-(the `tokenizers` library alone used ~250 MB; same token ids). Measured: ~300 MB steady, 377 MB peak.
+(the `tokenizers` library alone used ~250 MB; same token ids). That measured ~290 MB steady locally, but on
+Render's Linux one startup still went over 512 MB and was killed, so the image now also embeds the chunks at
+build time and pins native thread pools to one; startup logs its real memory use.
 
 ## 7. Streaming doesn't weaken the guarantee
 
