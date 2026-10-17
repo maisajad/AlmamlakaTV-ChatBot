@@ -12,7 +12,7 @@ const I18N = {
     inputLabel: "Your question",
     placeholder: "Ask a question…",
     send: "Send",
-    disclaimer: "Answers come only from the project documents and may contain mistakes. Check the cited sources.",
+    disclaimer: "Answers come only from the project documents. Check the cited sources.",
     qualityLink: "Test results: try to break it",
     typing: "Searching the project documents…",
     typingSlow: "Checking the sources, almost there…",
@@ -24,7 +24,6 @@ const I18N = {
     modeLabel: "Version",
     modeStandard: "Standard",
     modePro: "Pro RAG Chat",
-    modeProHint: "Pro: see each source highlighted in the original PDF, replies that stream as they are written, and voice.",
     showInDoc: "Show in document",
     openPdf: "Open PDF",
     close: "Close document",
@@ -49,7 +48,7 @@ const I18N = {
     inputLabel: "سؤالك",
     placeholder: "اكتب سؤالك…",
     send: "إرسال",
-    disclaimer: "الإجابات مستندة إلى وثائق المشروع فقط وقد تحتوي على أخطاء. راجع المصادر المذكورة.",
+    disclaimer: "الإجابات مستندة إلى وثائق المشروع فقط. راجع المصادر المذكورة.",
     qualityLink: "نتائج الاختبار: حاول أن تخدعه",
     typing: "جارٍ البحث في وثائق المشروع…",
     typingSlow: "جارٍ التحقق من المصادر، لحظات…",
@@ -61,7 +60,6 @@ const I18N = {
     modeLabel: "الإصدار",
     modeStandard: "قياسي",
     modePro: "Pro RAG Chat",
-    modeProHint: "Pro: شاهد كل مصدر مظلّلًا في ملف PDF الأصلي، مع ردود تظهر أثناء كتابتها ودعم الصوت.",
     showInDoc: "عرض في الوثيقة",
     openPdf: "فتح ملف PDF",
     close: "إغلاق الوثيقة",
@@ -82,7 +80,7 @@ const $ = (id) => document.getElementById(id);
 const els = {
   messages: $("messages"), welcome: $("welcome"), suggestions: $("suggestions"),
   form: $("composer"), input: $("input"), send: $("send"), langToggle: $("lang-toggle"), newChat: $("new-chat"),
-  modeButtons: [...document.querySelectorAll("[data-mode]")], modeHint: $("mode-hint"),
+  modeButtons: [...document.querySelectorAll("[data-mode]")],
 };
 
 const store = {
@@ -110,7 +108,6 @@ function applyLanguage(lang) {
   document.querySelectorAll("[data-i18n-placeholder]").forEach((el) => { el.placeholder = t[el.dataset.i18nPlaceholder]; });
   document.querySelectorAll("[data-i18n-aria]").forEach((el) => { el.setAttribute("aria-label", t[el.dataset.i18nAria]); });
   els.langToggle.textContent = t.langButton;
-  els.modeHint.textContent = t.modeProHint;
   if (typeof Voice !== "undefined") Voice.relabel();
   els.suggestions.replaceChildren(...t.suggestions.map((q) => {
     const chip = el("button", { className: "chip", type: "button", dir: "auto" }, q);
@@ -290,7 +287,7 @@ async function ask(question) {
     if (live) {
       reply = await streamReply(question, live);
     } else {
-      const res = await fetch("/api/chat", {
+      const res = await Auth.fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: question, session_id: sessionId }),
@@ -314,7 +311,7 @@ async function ask(question) {
 
 async function newChat() {
   if (sessionId) {
-    fetch("/api/reset", { method: "POST", headers: { "Content-Type": "application/json" },
+    Auth.fetch("/api/reset", { method: "POST", headers: { "Content-Type": "application/json" },
                           body: JSON.stringify({ session_id: sessionId }) }).catch(() => {});
   }
   sessionId = null;
@@ -339,11 +336,12 @@ for (const btn of els.modeButtons) btn.addEventListener("click", () => applyMode
 
 applyLanguage(uiLang);
 applyMode(mode);
+Auth.ensure();  // asks for the access code first, if the server requires one
 
 // /?q=... (used by the quality page's attack buttons) sends that question straight away.
 const preset = new URLSearchParams(location.search).get("q");
 if (preset) {
   history.replaceState(null, "", location.pathname);  // a reload must not resend it
   // Wait for the scripts after this one (pro.js streams Pro replies) before asking.
-  document.addEventListener("DOMContentLoaded", () => ask(preset));
+  document.addEventListener("DOMContentLoaded", () => Auth.ensure().then(() => ask(preset)));
 }

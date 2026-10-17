@@ -54,8 +54,8 @@ torch alone exceeds 512 MB, so embeddings run on ONNX Runtime with the model's o
 
 ## 7. Streaming doesn't weaken the guarantee
 
-In Pro, words appear as Claude writes them, under a "Draft, not verified yet" label. Only the verified
-reply replaces the draft; if verification fails, the draft is discarded.
+In Pro, words appear as Claude writes them, in a lighter colour. Only the verified reply replaces the
+draft; if verification fails, the draft is discarded.
 
 ## 8. Standard and Pro side by side
 

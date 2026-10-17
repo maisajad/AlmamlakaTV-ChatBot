@@ -1,11 +1,11 @@
 "use strict";
 
-/* Pro mode: streamed replies. The answer text appears as it is written, labelled as an
-   unverified draft; the verified reply then replaces it. Standard mode never calls this. */
+/* Pro mode: streamed replies. The answer text appears as it is written, in a lighter colour;
+   the verified reply then replaces it. Standard mode never calls this. */
 
 const PRO_I18N = {
-  en: { draftLabel: "Draft, not verified yet", rewriting: "Rewriting after a failed check…" },
-  ar: { draftLabel: "مسودة، لم يتم التحقق منها بعد", rewriting: "إعادة الكتابة بعد فشل أحد الفحوصات…" },
+  en: { rewriting: "Rewriting after a failed check…" },
+  ar: { rewriting: "إعادة الكتابة بعد فشل أحد الفحوصات…" },
 };
 
 function guessLanguage(text) {
@@ -20,7 +20,8 @@ function createLiveCard(lang) {
   const p = PRO_I18N[lang];
   const dots = el("div", { className: "typing", role: "status" },
     el("span", { className: "dots", "aria-hidden": "true" }, el("i"), el("i"), el("i")), el("span", {}, I18N[lang].typing));
-  const draftNote = el("p", { className: "draft-note" }, p.draftLabel);
+  // The draft streams in a lighter colour; the verified reply then replaces it.
+  const draftNote = el("p", { className: "draft-note", hidden: true });
   const draftText = el("div", { className: "draft-text answer", dir: "auto" });
   const draft = el("div", { className: "draft", hidden: true }, draftNote, draftText);
   const card = el("div", { className: "card live", dir: lang === "ar" ? "rtl" : "ltr", lang }, dots, draft);
@@ -31,7 +32,7 @@ function createLiveCard(lang) {
 
   return {
     draft(e) {
-      if (e.attempt !== attempt) { attempt = e.attempt; raw = ""; draftNote.textContent = p.rewriting; }
+      if (e.attempt !== attempt) { attempt = e.attempt; raw = ""; draftNote.textContent = p.rewriting; draftNote.hidden = false; }
       dots.remove();
       draft.hidden = false;
       raw += e.delta;
@@ -44,7 +45,7 @@ function createLiveCard(lang) {
 
 /** POST to the streaming endpoint and feed draft events to the live card; resolves with the final reply. */
 async function streamReply(question, live) {
-  const res = await fetch("/api/chat/stream", {
+  const res = await Auth.fetch("/api/chat/stream", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ message: question, session_id: sessionId }),

@@ -1,4 +1,4 @@
-"""Build static/quality-report.json (the /quality page) from the latest eval results.
+"""Build data/quality-report.json (the /quality page) from the latest eval results.
 
 Run the evals first; this only reads their output (and recomputes the free retrieval eval):
 
@@ -20,7 +20,7 @@ from app.llm import ANSWER_MODEL, ROUTER_MODEL
 from app.retrieval import ROOT
 from eval import answer_eval, conversation_eval, retrieval_eval
 
-OUT = ROOT / "static" / "quality-report.json"
+OUT = ROOT / "data" / "quality-report.json"
 CATEGORY_ORDER = ["facts", "conflicts", "out_of_scope", "injection", "dialect"]
 MAX_ANSWER_CHARS = 1600
 

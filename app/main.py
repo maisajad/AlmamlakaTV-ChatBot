@@ -34,6 +34,7 @@ from app.sessions import redis_client
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
 STATIC = ROOT / "static"
+QUALITY_REPORT = ROOT / "data" / "quality-report.json"  # served by /api/quality-report, behind the access code
 DEBUG = os.environ.get("DEBUG") == "1"  # include routing/retrieval details in replies
 PUBLIC_FIELDS = ("session_id", "status", "language", "answer", "citations", "conflicts")
 
@@ -131,9 +132,51 @@ def admin_page() -> HTMLResponse:
     return page("admin.html")
 
 
+def bearer(request: Request) -> str:
+    return request.headers.get("authorization", "").removeprefix("Bearer ").strip()
+
+
+def access_tokens() -> list[str]:
+    """User access codes: ACCESS_TOKENS, comma-separated (one per person makes revoking easy).
+    Unset or empty means the assistant is open to everyone."""
+    return [t.strip() for t in os.environ.get("ACCESS_TOKENS", "").split(",") if t.strip()]
+
+
+def user_allowed(request: Request) -> bool:
+    codes = access_tokens()
+    if not codes:
+        return True
+    if admin := os.environ.get("ADMIN_TOKEN"):
+        codes.append(admin)  # the admin can use the chat too
+    sent = bearer(request).encode()
+    # Compare against every code (no early exit), in constant time.
+    return sum(secrets.compare_digest(sent, code.encode()) for code in codes) > 0
+
+
+def require_user(request: Request) -> None:
+    if not user_allowed(request):
+        raise HTTPException(401, "Access code required.")
+
+
+@app.get("/api/auth")
+def auth_status(request: Request) -> dict:
+    """Whether an access code is needed, and whether the one sent (if any) is valid."""
+    return {"required": bool(access_tokens()), "ok": user_allowed(request)}
+
+
+@app.get("/api/quality-report")
+def quality_report(request: Request) -> Response:
+    """The /quality page's data (it quotes the documents, so it needs the access code too)."""
+    require_user(request)
+    if not QUALITY_REPORT.exists():
+        raise HTTPException(404, "No test report yet.")
+    return FileResponse(QUALITY_REPORT, media_type="application/json")
+
+
 @app.get("/pdfs/{name}", include_in_schema=False)
-def pdf(name: str) -> Response:
+def pdf(name: str, request: Request) -> Response:
     """Source documents for the viewer: committed PDFs from disk, uploaded ones from storage."""
+    require_user(request)
     if name != os.path.basename(name):
         raise HTTPException(404)
     path = PDF_DIR / name
@@ -154,8 +197,7 @@ def require_admin(request: Request) -> None:
     token = os.environ.get("ADMIN_TOKEN")
     if not token:
         raise HTTPException(404)  # admin is off: don't even admit it exists
-    sent = request.headers.get("authorization", "").removeprefix("Bearer ").strip()
-    if not secrets.compare_digest(sent.encode(), token.encode()):
+    if not secrets.compare_digest(bearer(request).encode(), token.encode()):
         raise HTTPException(401, "Wrong admin token.")
 
 
@@ -188,22 +230,24 @@ async def admin_delete(name: str, request: Request) -> dict:
 
 
 @app.post("/api/chat")
-def chat(request: ChatRequest) -> dict:
+def chat(body: ChatRequest, request: Request) -> dict:
     # A sync endpoint: FastAPI runs it in a worker thread, so slow model calls don't block the loop.
-    result = app.state.bot.chat(request.session_id, request.message)
+    require_user(request)
+    result = app.state.bot.chat(body.session_id, body.message)
     return result if DEBUG else {k: result[k] for k in PUBLIC_FIELDS}
 
 
 @app.post("/api/chat/stream")
-def chat_stream(request: ChatRequest) -> StreamingResponse:
+def chat_stream(body: ChatRequest, request: Request) -> StreamingResponse:
     """Server-Sent Events: the draft answer text while it is written, then the
     same verified reply /api/chat returns, as a final "result" event."""
+    require_user(request)
     events: queue.Queue = queue.Queue()
     done = object()
 
     def run() -> None:
         try:
-            result = app.state.bot.chat(request.session_id, request.message, on_event=events.put)
+            result = app.state.bot.chat(body.session_id, body.message, on_event=events.put)
             events.put({"type": "result", "reply": result if DEBUG else {k: result[k] for k in PUBLIC_FIELDS}})
         except Exception:  # never leave the client hanging on a broken stream
             logging.getLogger(__name__).exception("stream failed")
@@ -222,6 +266,7 @@ def chat_stream(request: ChatRequest) -> StreamingResponse:
 
 
 @app.post("/api/reset")
-def reset(request: ResetRequest) -> dict:
-    app.state.bot.sessions.reset(request.session_id)
+def reset(body: ResetRequest, request: Request) -> dict:
+    require_user(request)
+    app.state.bot.sessions.reset(body.session_id)
     return {"ok": True}

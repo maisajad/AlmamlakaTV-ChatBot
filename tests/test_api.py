@@ -48,6 +48,7 @@ class StubKB:
 def client(monkeypatch):
     monkeypatch.setattr(main, "build_state", lambda: (StubBot(), StubKB()))
     monkeypatch.delenv("ADMIN_TOKEN", raising=False)
+    monkeypatch.delenv("ACCESS_TOKENS", raising=False)
     with TestClient(main.app) as c:
         yield c
 
@@ -55,7 +56,7 @@ def client(monkeypatch):
 def test_quality_page_and_its_report(client):
     page = client.get("/quality")
     assert page.status_code == 200 and "Try to break it" in page.text
-    report = client.get("/static/quality-report.json").json()
+    report = client.get("/api/quality-report").json()
     assert {"summary", "cases", "conversations", "retrieval"} <= set(report)
 
 
@@ -138,3 +139,30 @@ def test_chat_rejects_bad_payloads(client):
 def test_reset(client):
     assert client.post("/api/reset", json={"session_id": "abc"}).json() == {"ok": True}
     assert client.app.state.bot.resets == ["abc"]
+
+
+def test_open_to_everyone_without_access_tokens(client):
+    assert client.get("/api/auth").json() == {"required": False, "ok": True}
+    assert client.post("/api/chat", json={"message": "hi"}).status_code == 200
+
+
+def test_access_codes_protect_chat_pdfs_and_report(client, monkeypatch):
+    monkeypatch.setenv("ACCESS_TOKENS", "reviewer-one-code, reviewer-two-code")
+    monkeypatch.setenv("ADMIN_TOKEN", "test-admin-token")
+    assert client.get("/api/auth").json() == {"required": True, "ok": False}
+    for method, path, body in [("post", "/api/chat", {"message": "hi"}), ("post", "/api/chat/stream", {"message": "hi"}),
+                               ("post", "/api/reset", {"session_id": "x"}), ("get", "/pdfs/Almamlaka_Budget_Timeline.pdf", None),
+                               ("get", "/api/quality-report", None)]:
+        kwargs = {"json": body} if body else {}
+        assert getattr(client, method)(path, **kwargs).status_code == 401, path
+        assert getattr(client, method)(path, headers={"Authorization": "Bearer wrong"}, **kwargs).status_code == 401, path
+    for code in ("reviewer-one-code", "reviewer-two-code", "test-admin-token"):  # each listed code, and the admin token
+        auth = {"Authorization": f"Bearer {code}"}
+        assert client.get("/api/auth", headers=auth).json() == {"required": True, "ok": True}
+        assert client.post("/api/chat", json={"message": "hi"}, headers=auth).status_code == 200
+
+
+def test_pages_still_load_behind_access_codes(client, monkeypatch):
+    monkeypatch.setenv("ACCESS_TOKENS", "reviewer-one-code")
+    assert client.get("/").status_code == 200  # the page shows the code screen itself
+    assert client.get("/api/health").status_code == 200

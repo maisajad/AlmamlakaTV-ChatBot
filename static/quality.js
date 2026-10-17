@@ -53,11 +53,6 @@ function render(report) {
     `Retrieval found the expected sources for ${report.retrieval.en.passed}/${report.retrieval.en.total} English and ` +
     `${report.retrieval.ar.passed}/${report.retrieval.ar.total} Arabic questions.`;
 
-  $("scores").replaceChildren(...Object.entries(report.summary).filter(([, s]) => s.total).map(([cat, s]) =>
-    el("div", { className: "q-score" + (s.passed === s.total ? " is-perfect" : "") },
-      el("span", { className: "q-score-num" }, `${s.passed}/${s.total}`),
-      el("span", { className: "q-score-name" }, CATEGORY_NAMES[cat] || cat))));
-
   const groups = [];
   for (const cat of Object.keys(CATEGORY_NAMES)) {
     if (cat === "follow_ups") {
@@ -75,7 +70,8 @@ function render(report) {
 $("attacks").replaceChildren(...ATTACKS.map((q) =>
   el("a", { className: "chip", href: `/?mode=pro&q=${encodeURIComponent(q)}`, dir: isArabic(q) ? "rtl" : "ltr" }, q)));
 
-fetch("/static/quality-report.json", { cache: "no-store" })
+Auth.ensure()
+  .then(() => Auth.fetch("/api/quality-report", { cache: "no-store" }))
   .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`))))
   .then(render)
   .catch(() => { $("meta").textContent = "No test report has been generated yet (python -m eval.report)."; });

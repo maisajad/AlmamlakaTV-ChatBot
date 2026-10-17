@@ -35,7 +35,8 @@ const DocViewer = (() => {
   async function getDoc(file) {
     if (!docs.has(file)) {
       const lib = await loadLib();
-      docs.set(file, lib.getDocument(`/pdfs/${encodeURIComponent(file)}`).promise.catch((e) => { docs.delete(file); throw e; }));
+      const source = { url: `/pdfs/${encodeURIComponent(file)}`, httpHeaders: Auth.headers() };
+      docs.set(file, lib.getDocument(source).promise.catch((e) => { docs.delete(file); throw e; }));
     }
     return docs.get(file);
   }
@@ -131,6 +132,7 @@ const DocViewer = (() => {
     metaEl.textContent = `${t.page} ${src.pages.join(", ")} · ${src.section ? `${t.section} ${src.section}: ` : ""}${src.section_title}`;
     noteEl.hidden = true;
     openLink.href = `/pdfs/${encodeURIComponent(src.file)}#page=${src.pages[0]}`;
+    openLink.dataset.page = src.pages[0];
     openLink.textContent = t.openPdf;
     closeBtn.setAttribute("aria-label", t.close);
     body.replaceChildren(el("div", { className: "viewer-loading" }, t.loadingDoc));
@@ -161,6 +163,16 @@ const DocViewer = (() => {
   }
 
   closeBtn.addEventListener("click", close);
+  // A plain link can't send the access code, so fetch the PDF with it and open the result.
+  openLink.addEventListener("click", async (e) => {
+    if (!Object.keys(Auth.headers()).length) return;  // no code in use: the link works as is
+    e.preventDefault();
+    const tab = window.open("", "_blank");
+    const res = await Auth.fetch(openLink.pathname);
+    if (!res.ok) { tab?.close(); return; }
+    const url = URL.createObjectURL(await res.blob());
+    if (tab) tab.location = `${url}#page=${openLink.dataset.page}`;
+  });
   document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !panel.hidden) close(); });
   return { open, close };
 })();
