@@ -3,6 +3,7 @@
     python -m eval.answer_eval            # all cases
     python -m eval.answer_eval --url https://your-app.onrender.com   # against a deployed instance
     python -m eval.answer_eval ceo q2-marketing   # just these ids
+    python -m eval.answer_eval --recheck          # re-apply the checks to the saved answers (no API calls)
 """
 
 from __future__ import annotations
@@ -61,7 +62,22 @@ def check(case: dict, result: dict) -> list[str]:
     return problems
 
 
+def recheck() -> int:
+    """After changing a check (not the bot), re-score the answers already recorded."""
+    cases = {c["id"]: c for c in yaml.safe_load(CASES_PATH.read_text(encoding="utf-8"))}
+    records = json.loads(RESULTS_PATH.read_text(encoding="utf-8"))
+    for r in records:
+        r["problems"] = check(cases[r["id"]], r["result"])
+        print(f"{'PASS' if not r['problems'] else 'FAIL'} {r['id']:<28} {'; '.join(r['problems'])}")
+    RESULTS_PATH.write_text(json.dumps(records, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    failed = sum(bool(r["problems"]) for r in records)
+    print(f"\n{len(records) - failed}/{len(records)} passed (rechecked, no API calls)")
+    return 1 if failed else 0
+
+
 def main(args: list[str]) -> int:
+    if "--recheck" in args:
+        return recheck()
     url = args[args.index("--url") + 1] if "--url" in args else None
     ids = [a for a in args if a != "--url" and a != url]
     logging.basicConfig(level=logging.WARNING, format="%(levelname)s %(name)s: %(message)s")
