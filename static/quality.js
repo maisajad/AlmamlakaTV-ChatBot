@@ -68,7 +68,7 @@ function render(report) {
 }
 
 $("attacks").replaceChildren(...ATTACKS.map((q) =>
-  el("a", { className: "chip", href: `/?mode=pro&q=${encodeURIComponent(q)}`, dir: isArabic(q) ? "rtl" : "ltr" }, q)));
+  el("a", { className: "chip", href: `/?q=${encodeURIComponent(q)}`, dir: isArabic(q) ? "rtl" : "ltr" }, q)));
 
 Auth.ensure()
   .then(() => Auth.fetch("/api/quality-report", { cache: "no-store" }))

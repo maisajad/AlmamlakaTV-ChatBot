@@ -54,15 +54,10 @@ torch alone exceeds 512 MB, so embeddings run on ONNX Runtime with the model's o
 
 ## 7. Streaming doesn't weaken the guarantee
 
-In Pro, words appear as Claude writes them, in a lighter colour. Only the verified reply replaces the
+Words appear as Claude writes them, in a lighter colour. Only the verified reply replaces the
 draft; if verification fails, the draft is discarded.
 
-## 8. Standard and Pro side by side
-
-Standard is the assignment as specified. Pro adds the source viewer, streaming and voice. Both run
-through the same verified pipeline, so the extras never change what counts as a correct answer.
-
-## 9. The cheapest model that holds up, per step
+## 8. The cheapest model that holds up, per step
 
 Cited answers run on Claude Sonnet 5.5 and the classify-and-rewrite step on Claude Haiku 5.5 (offline
 conflict detection on Sonnet). Moving down from Opus 5.5 kept every eval result, made replies faster

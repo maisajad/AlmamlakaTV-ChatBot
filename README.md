@@ -7,20 +7,8 @@ a clear "I don't have that information".
 
 - **Live demo:** https://almamlaka-assistant-hrj9.onrender.com (free tier: after 15 idle minutes the
   first load takes about a minute to wake up)
-- **Pro version directly:** https://almamlaka-assistant-hrj9.onrender.com/?mode=pro
 - **Test results, and attacks to try yourself:** https://almamlaka-assistant-hrj9.onrender.com/quality
 - **Why it's built this way:** [docs/DECISIONS.md](docs/DECISIONS.md) · **2-minute demo plan:** [docs/DEMO_SCRIPT.md](docs/DEMO_SCRIPT.md)
-
-## Two versions, one switch
-
-A **Standard / Pro RAG Chat** switch sits under the header. Both run through the same verified pipeline.
-
-| | Standard | Pro RAG Chat |
-|---|---|---|
-| Grounded answers, citations, conflict flags, refusals, follow-ups, Arabic/English, injection resistance | ✓ | ✓ |
-| Click a citation → the original PDF page opens with the quoted words highlighted | | ✓ |
-| Replies stream as they're written; the verified reply replaces the draft | | ✓ |
-| Ask by voice (Jordanian Arabic or English) and listen to answers | | ✓ |
 
 ## How it answers a message
 
@@ -60,7 +48,7 @@ message ─► guard ─► rewrite ─► retrieve ─► answer ─► verify 
 |---|---|
 | Answers strictly from the PDFs | Prompt rules + citation verifier: no valid citation, no answer |
 | Out-of-scope → says so | `not_in_documents` / `out_of_scope` statuses with fixed replies; router short-circuits off-topic |
-| Cites document and page/section | Labels built from chunk metadata, never model text; verbatim quote on expand; Pro highlights it in the PDF |
+| Cites document and page/section | Labels built from chunk metadata, never model text; verbatim quote on expand; clicking it highlights the quote in the PDF |
 | Flags conflicting information | Reviewed conflict registry + conflict-group retrieval + `conflicts` field + amber callout |
 | Multi-turn follow-ups | Server-side sessions (last 6 turns, in Redis when available); rewrite resolves "it", "she", "and Q4?" |
 | Replies in the user's language | Per-message detection incl. Arabizi; output checked by script and retried if wrong; RTL UI |
@@ -70,12 +58,12 @@ message ─► guard ─► rewrite ─► retrieve ─► answer ─► verify 
 
 ## Beyond the brief
 
-- **Source viewer (Pro):** a citation opens the cited PDF page (PDF.js) with the quote highlighted,
+- **Source viewer:** a citation opens the cited PDF page (PDF.js) with the quote highlighted,
   table cells included.
-- **Streaming (Pro):** answer text appears as it's generated, in a lighter colour; the verified
+- **Streaming:** answer text appears as it's generated, in a lighter colour; the verified
   reply replaces it.
 - **Jordanian dialect and Arabizi**, answered in Modern Standard Arabic.
-- **Voice (Pro):** dictation and read-aloud through the browser's speech APIs.
+- **Voice:** dictation and read-aloud through the browser's speech APIs.
 - **New PDFs without scripts:** PDFs committed to `data/pdfs` are re-ingested automatically at startup
   when they change; `/admin` (enabled by `ADMIN_TOKEN`) uploads a PDF and makes it searchable within
   seconds, without a restart. Conflict detection reruns in the background either way.

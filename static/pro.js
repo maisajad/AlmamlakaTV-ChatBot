@@ -1,7 +1,7 @@
 "use strict";
 
-/* Pro mode: streamed replies. The answer text appears as it is written, in a lighter colour;
-   the verified reply then replaces it. Standard mode never calls this. */
+/* Streamed replies. The answer text appears as it is written, in a lighter colour;
+   the verified reply then replaces it. */
 
 const PRO_I18N = {
   en: { rewriting: "Rewriting after a failed check…" },

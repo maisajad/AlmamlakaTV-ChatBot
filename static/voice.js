@@ -1,6 +1,6 @@
 "use strict";
 
-/* Pro mode voice, with the browser's own speech APIs: dictate a question, and listen to answers.
+/* Voice, with the browser's own speech APIs: dictate a question, and listen to answers.
    Each control only appears where the browser supports it (Chrome and Edge best; Safari's
    speech recognition and Arabic voices vary). */
 
@@ -20,7 +20,7 @@ const Voice = (() => {
 
   function setupMic() {
     if (!Recognition) return;
-    micButton = el("button", { type: "button", className: "mic pro-only", "aria-pressed": "false" });
+    micButton = el("button", { type: "button", className: "mic", "aria-pressed": "false" });
     micButton.innerHTML = '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M12 3a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3zM5 11a7 7 0 0 0 14 0M12 18v3" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg>';
     els.send.before(micButton);
     micButton.addEventListener("click", () => (recognizer ? recognizer.stop() : listen()));
@@ -84,7 +84,7 @@ const Voice = (() => {
   function decorate(card, reply, lang) {
     if (!synth || !reply.answer || reply.status === "error") return;
     const t = VOICE_I18N[lang];
-    const button = el("button", { type: "button", className: "listen pro-only" }, t.listen);
+    const button = el("button", { type: "button", className: "listen" }, t.listen);
     button.hidden = !voiceFor(lang);  // voices can load late; re-checked below
     let speaking = false;
     button.addEventListener("click", () => {

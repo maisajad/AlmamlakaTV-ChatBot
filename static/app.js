@@ -15,15 +15,11 @@ const I18N = {
     disclaimer: "Answers come only from the project documents. Check the cited sources.",
     qualityLink: "Test results: try to break it",
     typing: "Searching the project documents…",
-    typingSlow: "Checking the sources, almost there…",
     sources: "Sources",
     page: "p.",
     section: "Section",
     conflict: "Conflicting information in the documents",
     networkError: "Couldn't reach the assistant. Check your connection and try again.",
-    modeLabel: "Version",
-    modeStandard: "Standard",
-    modePro: "Pro RAG Chat",
     showInDoc: "Show in document",
     openPdf: "Open PDF",
     close: "Close document",
@@ -51,15 +47,11 @@ const I18N = {
     disclaimer: "الإجابات مستندة إلى وثائق المشروع فقط. راجع المصادر المذكورة.",
     qualityLink: "نتائج الاختبار: حاول أن تخدعه",
     typing: "جارٍ البحث في وثائق المشروع…",
-    typingSlow: "جارٍ التحقق من المصادر، لحظات…",
     sources: "المصادر",
     page: "ص.",
     section: "القسم",
     conflict: "معلومات متعارضة بين الوثائق",
     networkError: "تعذّر الاتصال بالمساعد. تحقّق من اتصالك وحاول مجددًا.",
-    modeLabel: "الإصدار",
-    modeStandard: "قياسي",
-    modePro: "Pro RAG Chat",
     showInDoc: "عرض في الوثيقة",
     openPdf: "فتح ملف PDF",
     close: "إغلاق الوثيقة",
@@ -80,7 +72,6 @@ const $ = (id) => document.getElementById(id);
 const els = {
   messages: $("messages"), welcome: $("welcome"), suggestions: $("suggestions"),
   form: $("composer"), input: $("input"), send: $("send"), langToggle: $("lang-toggle"), newChat: $("new-chat"),
-  modeButtons: [...document.querySelectorAll("[data-mode]")],
 };
 
 const store = {
@@ -89,9 +80,6 @@ const store = {
 };
 
 let uiLang = store.get("localStorage", "uiLang") || ((navigator.language || "").startsWith("ar") ? "ar" : "en");
-// "standard" is the assignment as specified; "pro" layers on the extra features. ?mode=pro links straight to it.
-let mode = new URLSearchParams(location.search).get("mode") || store.get("localStorage", "mode") || "standard";
-const isPro = () => mode === "pro";
 // Not persisted: a reload clears the visible chat, so the server-side history must start over too.
 let sessionId = null;
 let busy = false;
@@ -114,14 +102,6 @@ function applyLanguage(lang) {
     chip.addEventListener("click", () => ask(q));
     return chip;
   }));
-}
-
-function applyMode(next) {
-  mode = next === "pro" ? "pro" : "standard";
-  store.set("localStorage", "mode", mode);
-  document.body.classList.toggle("mode-pro", isPro());
-  for (const btn of els.modeButtons) btn.setAttribute("aria-pressed", String(btn.dataset.mode === mode));
-  if (!isPro() && typeof DocViewer !== "undefined") DocViewer.close();
 }
 
 // ---------- small DOM helpers ----------
@@ -195,19 +175,6 @@ function addUserMessage(text) {
   scrollToBottom();
 }
 
-function addTyping() {
-  const t = I18N[uiLang];
-  const label = el("span", {}, t.typing);
-  const node = el("li", { className: "msg msg-bot" },
-    el("div", { className: "avatar", "aria-hidden": "true" }, "م"),
-    el("div", { className: "card is-info" },
-      el("div", { className: "typing", role: "status" }, el("span", { className: "dots", "aria-hidden": "true" }, el("i"), el("i"), el("i")), label)));
-  const slow = setTimeout(() => { label.textContent = t.typingSlow; }, 7000);
-  els.messages.append(node);
-  scrollToBottom();
-  return () => { clearTimeout(slow); node.remove(); };
-}
-
 function addBotMessage(reply) {
   const lang = reply.language === "ar" ? "ar" : "en";
   const t = I18N[lang];
@@ -242,7 +209,7 @@ function addBotMessage(reply) {
         el("summary", {}, el("span", { className: "source-n" }, items.map((c) => `[${c.n}]`).join("")),
                       el("span", {}, ...sourceLabel(src, t))),
         ...items.map((c) => {
-          const show = el("button", { type: "button", className: "show-in-doc pro-only" }, t.showInDoc);
+          const show = el("button", { type: "button", className: "show-in-doc" }, t.showInDoc);
           show.addEventListener("click", () => DocViewer.open(c, lang, show));
           return el("div", { className: "quote-row" }, el("blockquote", { lang: "en" }, `“${c.quote}”`), show);
         }));
@@ -253,7 +220,7 @@ function addBotMessage(reply) {
     answer.addEventListener("click", (e) => {
       const btn = e.target.closest(".cite");
       if (!btn) return;
-      if (isPro()) DocViewer.open(citationFor[btn.dataset.n], lang, btn);  // Pro: straight to the highlighted page
+      DocViewer.open(citationFor[btn.dataset.n], lang, btn);  // straight to the highlighted page
       const source = entryFor[btn.dataset.n];
       source.open = true;
       source.scrollIntoView({ behavior: "smooth", block: "nearest" });
@@ -262,7 +229,7 @@ function addBotMessage(reply) {
     });
   }
 
-  if (typeof Voice !== "undefined") Voice.decorate(card, reply, lang);  // Pro: "Listen" button
+  if (typeof Voice !== "undefined") Voice.decorate(card, reply, lang);  // "Listen" button
 
   els.messages.append(el("li", { className: "msg msg-bot" }, el("div", { className: "avatar", "aria-hidden": "true" }, "م"), card));
   scrollToBottom();
@@ -280,21 +247,10 @@ async function ask(question) {
   autosize();
   let stopTyping = () => {};
   try {
-    // Pro streams with live steps; Standard waits for the complete reply behind a typing indicator.
-    const live = isPro() ? createLiveCard(guessLanguage(question)) : null;
-    stopTyping = live ? () => live.remove() : addTyping();
-    let reply;
-    if (live) {
-      reply = await streamReply(question, live);
-    } else {
-      const res = await Auth.fetch("/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: question, session_id: sessionId }),
-      });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      reply = await res.json();
-    }
+    // Typing dots, then the answer streams in as it is written (pro.js); the verified reply replaces it.
+    const live = createLiveCard(guessLanguage(question));
+    stopTyping = () => live.remove();
+    const reply = await streamReply(question, live);
     sessionId = reply.session_id;
     stopTyping();
     addBotMessage(reply);
@@ -332,10 +288,8 @@ els.input.addEventListener("keydown", (e) => {
 });
 els.langToggle.addEventListener("click", () => applyLanguage(uiLang === "ar" ? "en" : "ar"));
 els.newChat.addEventListener("click", newChat);
-for (const btn of els.modeButtons) btn.addEventListener("click", () => applyMode(btn.dataset.mode));
 
 applyLanguage(uiLang);
-applyMode(mode);
 Auth.ensure();  // asks for the access code first, if the server requires one
 
 // /?q=... (used by the quality page's attack buttons) sends that question straight away.

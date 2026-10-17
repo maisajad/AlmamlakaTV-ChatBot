@@ -199,25 +199,9 @@ button, textarea { font: inherit; color: inherit; }
   .bubble { max-width: 92%; }
 }
 
-/* ---------- Standard / Pro switch ---------- */
-.pro-only { display: none !important; }
-[hidden] { display: none !important; }  /* beats .pro-only and component display rules */
-body.mode-pro .pro-only { display: revert !important; }
-.modebar { border-bottom: 1px solid var(--line); background: var(--surface); }
-.modebar-inner {
-  max-width: 880px; margin: 0 auto; padding: 8px 16px;
-  display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
-}
-.mode-switch { display: inline-flex; padding: 3px; border-radius: 999px; background: var(--page); border: 1px solid var(--line); flex: none; }
-.mode-switch button {
-  display: inline-flex; align-items: center; gap: 6px; border: 0; background: transparent; cursor: pointer;
-  padding: 5px 14px; border-radius: 999px; font-size: 14px; font-weight: 600; color: var(--muted);
-}
-.mode-switch button[aria-pressed="true"] { background: var(--surface); color: var(--ink); box-shadow: var(--shadow); }
-.mode-switch button[data-mode="pro"][aria-pressed="true"] { background: var(--brand); color: #fff; }
-.mode-switch button:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+[hidden] { display: none !important; }  /* beats component display rules */
 
-/* ---------- source viewer (Pro) ---------- */
+/* ---------- source viewer ---------- */
 .quote-row { display: flex; align-items: flex-start; gap: 8px; }
 .quote-row blockquote { flex: 1; min-width: 0; }
 .show-in-doc {
@@ -255,13 +239,13 @@ body.mode-pro .pro-only { display: revert !important; }
 
 /* Side by side on wide screens: the chat makes room instead of being covered. */
 @media (min-width: 1180px) {
-  body.viewer-open .topbar-inner, body.viewer-open .modebar-inner, body.viewer-open .chat, body.viewer-open .composer,
+  body.viewer-open .topbar-inner, body.viewer-open .chat, body.viewer-open .composer,
   body.viewer-open .disclaimer {
     width: auto; margin-inline-start: max(16px, calc((100vw - 580px - 880px) / 2)); margin-inline-end: 596px;
   }
 }
 
-/* ---------- streaming draft (Pro) ---------- */
+/* ---------- streaming draft ---------- */
 .draft { padding-top: 2px; }
 .draft-note { margin: 0 0 6px; font-size: 12.5px; font-weight: 600; color: var(--warn-ink); }
 .draft-text { color: var(--muted); }
@@ -314,7 +298,7 @@ a.btn-ghost { text-decoration: none; color: var(--ink); }
 .q-cites q { direction: ltr; unicode-bidi: isolate; }
 .disclaimer a { color: var(--brand); font-weight: 600; white-space: nowrap; }
 
-/* ---------- voice (Pro) ---------- */
+/* ---------- voice ---------- */
 .mic {
   flex: none; width: 40px; height: 40px; border-radius: 12px; border: 1px solid var(--line); cursor: pointer;
   background: transparent; color: var(--brand); display: grid; place-items: center;
