@@ -1,7 +1,7 @@
 {
  "generated": "2026-10-17",
  "model": "claude-sonnet-5-5 (answers) and claude-haiku-5-5 (routing)",
- "target": "local instance",
+ "target": "live Render deployment",
  "summary": {
   "facts": {
    "passed": 7,
@@ -47,7 +47,7 @@
    "problems": [],
    "status": "answered",
    "language": "en",
-   "answer": "The quarterly allocation table shows **$150,000** for marketing in Q2 2027 [1]. Note that this table reflects the originally approved budget. The Finance Committee revised the total project budget to $2,600,000 in December 2026 to cover additional smart TV integration costs [2]. The documents do not say how the revised total is split across quarters or categories, so it is unclear whether the Q2 2027 marketing figure changed.",
+   "answer": "The quarterly allocation table lists **$150,000** for marketing in Q2 2027 [1]. Note that this table reflects the originally approved budget (total $2,400,000); the documents say the total was later revised to $2,600,000 by the Finance Committee in December 2026 to cover additional smart TV integration costs [2]. The documents do not say how the revised budget changes the Q2 2027 marketing allocation, so it is unknown whether the $150,000 figure still applies.",
    "citations": [
     {
      "n": 1,
@@ -61,7 +61,7 @@
     }
    ],
    "conflicts": [
-    "Total project budget (affects the baseline for the quarterly allocations)"
+    "Total project budget (relevant to the allocation table)"
    ]
   },
   {
@@ -90,7 +90,7 @@
    "problems": [],
    "status": "answered",
    "language": "en",
-   "answer": "Decisions requiring budget changes **above $50,000** must be approved by the Finance Committee before implementation [1]. The documents do not define any other approval thresholds or categories of changes. Separately, the Finance Committee revised the total project budget to $2,600,000 in December 2026 [2].",
+   "answer": "Decisions requiring budget changes **above $50,000** must be approved by the Finance Committee before implementation [1]. The documents do not state whether smaller changes need that approval. For budget or scope changes, escalate to the Project Lead, who brings the item to the steering committee for review [2]. The documents also mention a December 2026 Finance Committee revision of the total budget to $2,600,000 [3].",
    "citations": [
     {
      "n": 1,
@@ -99,6 +99,11 @@
     },
     {
      "n": 2,
+     "label": "Team & Governance Document · p. 2 · Section 6: Escalation Contacts",
+     "quote": "For budget or scope changes, escalate to the Project Lead, who will bring the item to the steering committee for review."
+    },
+    {
+     "n": 3,
      "label": "Budget & Timeline Breakdown · p. 1 · Section 2: Budget Notes",
      "quote": "Following a revision by the Finance Committee in December 2026, the total project budget was adjusted to $2,600,000"
     }
@@ -113,7 +118,7 @@
    "problems": [],
    "status": "answered",
    "language": "en",
-   "answer": "The documents give only part of the list. The mobile app will support content and subtitles in 12 languages, and four are named: Arabic, English, French, and Spanish [1]. The documents do not name the other 8 languages. They only say more languages may be added in future phases [1].",
+   "answer": "The documents say the mobile app will support content and subtitles in 12 languages, but they name only four: Arabic, English, French, and Spanish [1]. The other 8 languages are not listed in the documents, so I can't give the full list. The documents also mention plans to add more languages in future phases [1].",
    "citations": [
     {
      "n": 1,
@@ -131,7 +136,7 @@
    "problems": [],
    "status": "answered",
    "language": "ar",
-   "answer": "تقود المشروع سارة الراشد (Sara Al-Rashid)، مديرة المشروع من قسم الاستراتيجية الرقمية [1][2]. ويرعى المشروع قسم الاستراتيجية الرقمية في Almamlaka TV وتشرف عليه لجنة توجيهية تضم ممثلين عن الهندسة والمحتوى والتسويق والشؤون القانونية والامتثال [3].",
+   "answer": "تقود المشروع **سارة الرشيد** (Sara Al-Rashid)، قائدة المشروع من قسم الاستراتيجية الرقمية [1][2]. ويرعى المشروع قسم الاستراتيجية الرقمية في Almamlaka TV وتشرف عليه لجنة توجيهية تضم ممثلين عن الهندسة والمحتوى والتسويق والشؤون القانونية والامتثال [3].",
    "citations": [
     {
      "n": 1,
@@ -146,7 +151,7 @@
     {
      "n": 3,
      "label": "Project Overview Document · p. 2 · Section 5: Stakeholders",
-     "quote": "sponsored by the Almamlaka TV Digital Strategy Department and overseen by a steering committee"
+     "quote": "sponsored by the Almamlaka TV Digital Strategy Department and overseen by a steering committee consisting of representatives from Engineering, Content, Marketing, and Legal & Compliance"
     }
    ],
    "conflicts": []
@@ -159,7 +164,7 @@
    "problems": [],
    "status": "answered",
    "language": "ar",
-   "answer": "المبلغ المخصص للتسويق في الربع الثاني من عام 2027 هو 150,000 دولار [1]. ملاحظة: هذا الرقم وارد في جدول الميزانية الأصلية المعتمدة، وتذكر الوثائق أن لجنة المالية عدّلت إجمالي ميزانية المشروع في ديسمبر 2026 إلى 2,600,000 دولار لتغطية تكاليف إضافية لدمج التلفزيونات الذكية [2]، لكنها لا تبيّن كيف انعكس هذا التعديل على مخصصات التسويق في الربع الثاني.",
+   "answer": "بحسب جدول التخصيص الربعي للميزانية، المبلغ المخصص للتسويق في الربع الثاني من عام 2027 هو 150,000 دولار [1]. ويُذكر أن هذه الأرقام تمثل الميزانية المعتمدة في الأصل، وأن لجنة المالية عدّلت إجمالي ميزانية المشروع في ديسمبر 2026 إلى 2,600,000 دولار بسبب تكاليف إضافية لتكامل التلفزيونات الذكية [2]. ولا تذكر الوثائق كيف وُزّع هذا التعديل على الأرباع أو على بند التسويق، لذلك لا أستطيع تأكيد ما إذا تغيّر مبلغ التسويق في الربع الثاني.",
    "citations": [
     {
      "n": 1,
@@ -172,9 +177,7 @@
      "quote": "the total project budget was adjusted to $2,600,000 to account for additional smart TV integration costs not included in the original scope"
     }
    ],
-   "conflicts": [
-    "إجمالي ميزانية المشروع (يؤثر على مدى اعتماد جدول التوزيع الربعي)"
-   ]
+   "conflicts": []
   },
   {
    "id": "arithmetic",
@@ -184,7 +187,7 @@
    "problems": [],
    "status": "answered",
    "language": "en",
-   "answer": "Marketing accounts for $460,000 of the originally approved $2,400,000 budget, about 19.2% (a calculation: 460,000 / 2,400,000 ≈ 0.1917) [1][2]. The budget notes say these figures reflect the originally approved budget [3]. A later revision is mentioned, but it does not change this calculation, which uses the original figures. The revised total was $2,600,000 following a December 2026 Finance Committee revision, and the documents do not give a marketing breakdown for it [4].",
+   "answer": "Marketing accounts for $460,000 of the originally approved budget of $2,400,000, which is about 19.2% (a calculation: 460,000 / 2,400,000) [1][2]. The documents note that this table reflects the originally approved budget; a later revision to $2,600,000 is mentioned, but it does not say how marketing would be affected [3].",
    "citations": [
     {
      "n": 1,
@@ -200,11 +203,6 @@
      "n": 3,
      "label": "Budget & Timeline Breakdown · p. 1 · Section 2: Budget Notes",
      "quote": "the figures above reflect the originally approved budget"
-    },
-    {
-     "n": 4,
-     "label": "Budget & Timeline Breakdown · p. 1 · Section 2: Budget Notes",
-     "quote": "the total project budget was adjusted to $2,600,000"
     }
    ],
    "conflicts": []
@@ -217,7 +215,7 @@
    "problems": [],
    "status": "answered",
    "language": "en",
-   "answer": "The documents give two different totals for the budget, so I can't say which is correct:\n- The Project Overview lists a total approved budget of $2,400,000, and the quarterly allocation table also totals $2,400,000 [1][2].\n- The Budget Notes say the table reflects the originally approved budget, and that after a Finance Committee revision in December 2026 the total project budget was adjusted to $2,600,000 for additional smart TV integration costs [3].",
+   "answer": "The documents give different totals for the budget, so I can't say which one is correct:\n- The Project Overview lists a total approved budget of $2,400,000, and the quarterly allocation table also totals $2,400,000 [1][2].\n- The Budget Notes say the table reflects the originally approved budget, and that after a Finance Committee revision in December 2026 the total was adjusted to $2,600,000 to cover additional smart TV integration costs [3].",
    "citations": [
     {
      "n": 1,
@@ -247,7 +245,7 @@
    "problems": [],
    "status": "answered",
    "language": "en",
-   "answer": "The documents give conflicting launch dates, so I can't say which is correct.\n\n- **March 15, 2027**: the Project Overview lists it as the planned launch date [1], and the Budget & Timeline milestone table lists the public launch on the same date [2].\n- **April 1, 2027**: the Team & Governance document says that, following the steering committee meeting on January 20, 2027, the launch date was moved to this date to allow more time for smart TV integration testing [3].\n\nThe Team & Governance document gives the January 20, 2027 revision, but the other two documents give no revision dates. Separately, the timeline shows QA and testing running from Mar 1 to Mar 20, 2027, which extends past the March 15 launch [4].",
+   "answer": "The documents give two different public launch dates, so I can't say which one is current.\n\n- **March 15, 2027**: The Project Overview lists it as the planned launch date [1], and the Budget & Timeline project timeline lists the public launch on the same date [2].\n- **April 1, 2027**: The Team & Governance document says that, following the steering committee meeting on January 20, 2027, the launch date was moved to April 1, 2027 to allow more time for smart TV integration testing [3].\n\nThe Team & Governance revision is tied to a January 20, 2027 meeting. The other two documents carry no revision date or wording.\n\nThe timeline also shows QA and testing running from Mar 1 to Mar 20, 2027, so a March 15 launch would fall before QA ends [4].",
    "citations": [
     {
      "n": 1,
@@ -271,7 +269,8 @@
     }
    ],
    "conflicts": [
-    "Public launch date"
+    "Public launch date",
+    "QA phase overlapping the launch date"
    ]
   },
   {
@@ -282,7 +281,7 @@
    "problems": [],
    "status": "answered",
    "language": "ar",
-   "answer": "تختلف الوثائق في تحديد الميزانية الإجمالية للمبادرة:\n- **$2,400,000**: هذا هو إجمالي الميزانية المعتمدة بحسب وثيقة نظرة عامة على المشروع [1]، وهو أيضًا مجموع جدول التوزيع الربع سنوي للميزانية المعتمدة [2].\n- **$2,600,000**: بحسب ملاحظات الميزانية، تم تعديل إجمالي ميزانية المشروع إلى هذا الرقم بعد مراجعة من لجنة المالية في كانون الأول (ديسمبر) 2026 لتغطية تكاليف إضافية لتكامل التلفزيونات الذكية لم تكن ضمن النطاق الأصلي [3]. وتذكر الوثيقة نفسها أن الأرقام في الجدول تعكس الميزانية المعتمدة أصلًا [3].\n\nلا أحدد أي الرقمين هو الصحيح؛ فالوثائق لا تبيّن سوى ما ورد أعلاه.",
+   "answer": "تتعارض الوثائق بشأن الميزانية الإجمالية للمبادرة:\n\n- **2,400,000 دولار**: تذكر وثيقة نظرة عامة على المشروع أن إجمالي الميزانية المعتمدة هو 2,400,000 دولار [1]، ويبلغ مجموع جدول التخصيص الربع سنوي المبلغ نفسه [2]. وتوضح ملاحظات الميزانية أن هذه الأرقام تعكس الميزانية المعتمدة في الأصل [3].\n- **2,600,000 دولار**: تذكر ملاحظات الميزانية أنه بعد مراجعة أجرتها لجنة المالية في ديسمبر 2026 عُدّل إجمالي ميزانية المشروع إلى 2,600,000 دولار لتغطية تكاليف إضافية لدمج التلفزيونات الذكية لم تكن ضمن النطاق الأصلي [3].\n\nلا تحدد الوثائق أيّ الرقمين هو المعتمد حالياً، ولا تذكر وثيقة نظرة عامة على المشروع أي تحديث لرقمها.",
    "citations": [
     {
      "n": 1,
@@ -297,7 +296,7 @@
     {
      "n": 3,
      "label": "Budget & Timeline Breakdown · p. 1 · Section 2: Budget Notes",
-     "quote": "Following a revision by the Finance Committee in December 2026, the total project budget was adjusted to $2,600,000"
+     "quote": "the total project budget was adjusted to $2,600,000 to account for additional smart TV integration costs not included in the original scope"
     }
    ],
    "conflicts": [
@@ -312,7 +311,7 @@
    "problems": [],
    "status": "answered",
    "language": "ar",
-   "answer": "تختلف الوثائق حول موعد الإطلاق العام، ولا يمكن ترجيح إحداها:\n- وثيقة نظرة عامة على المشروع تذكر أن تاريخ الإطلاق المخطط هو 15 مارس 2027 [1].\n- الجدول الزمني في وثيقة الميزانية والجدول الزمني يحدد الإطلاق العام في 15 مارس 2027 [2].\n- وثيقة الفريق والحوكمة تذكر أنه بعد اجتماع اللجنة التوجيهية في 20 يناير 2027 تم نقل تاريخ الإطلاق العام إلى 1 أبريل 2027 لإتاحة وقت إضافي لاختبار تكامل التلفزيونات الذكية [3].\n\nملاحظة: وثيقة الفريق والحوكمة تصف التاريخ بأنه \"مُعدَّل\" وتربطه باجتماع 20 يناير 2027، بينما لا تحمل الوثيقتان الأخريان تاريخ مراجعة، ولا تحدد الوثائق أيها هو المعتمد.",
+   "answer": "تتضارب الوثائق بشأن موعد الإطلاق العام، ولا يمكنني ترجيح إحدى الروايتين:\n- **15 مارس 2027**: ورد هذا الموعد بوصفه تاريخ الإطلاق المخطط في وثيقة نظرة عامة على المشروع [1]، وبوصفه تاريخ الإطلاق العام في الجدول الزمني [2].\n- **1 أبريل 2027**: بحسب وثيقة الفريق والحوكمة، نُقل موعد الإطلاق العام إلى هذا التاريخ بعد اجتماع اللجنة التوجيهية في 20 يناير 2027، لإتاحة وقت إضافي لاختبار التكامل مع التلفزيونات الذكية [3].\n\nملاحظة: الجدول الزمني يحدد فترة الفحص والاختبار من 1 إلى 20 مارس 2027 [4]، أي أن موعد 15 مارس يسبق انتهاءها.",
    "citations": [
     {
      "n": 1,
@@ -328,6 +327,11 @@
      "n": 3,
      "label": "Team & Governance Document · p. 1 · Section 3: Revised Launch Date",
      "quote": "the public launch date was moved to April 1, 2027"
+    },
+    {
+     "n": 4,
+     "label": "Budget & Timeline Breakdown · p. 2 · Section 3: Project Timeline",
+     "quote": "| QA & testing | Mar 1 - Mar 20, 2027 |"
     }
    ],
    "conflicts": [
@@ -342,7 +346,7 @@
    "problems": [],
    "status": "answered",
    "language": "en",
-   "answer": "Not according to the timeline. QA & testing run from Mar 1 to Mar 20, 2027, while the public launch is listed as March 15, 2027, so QA would end 5 days after launch (a calculation from the stated dates) [1][2]. However, a later document says the public launch date was moved to April 1, 2027 after the January 20, 2027 steering committee meeting [3]. Against April 1, QA (ending Mar 20) would finish before launch, but the documents do not state how the QA schedule was updated. The timeline table and the governance document give different launch dates, and neither document says which one supersedes the other.",
+   "answer": "It depends on which launch date applies, and the documents disagree.\n\n- **Timeline table:** QA and testing run Mar 1 - Mar 20, 2027 [1], but the public launch is March 15, 2027 [2]. Under this version QA would end 5 days after launch (a calculation), so it would not finish before launch.\n- **Revised launch date:** After the steering committee meeting on January 20, 2027, the launch was moved to April 1, 2027 [3]. Under this date QA (ending Mar 20, 2027) would finish before launch. The documents do not say whether the QA dates were also updated.\n\nThe documents do not state which version is current. Separately, the risk notes say any delay in development completion beyond March 1, 2027 poses a direct risk to the launch date [4].",
    "citations": [
     {
      "n": 1,
@@ -358,10 +362,15 @@
      "n": 3,
      "label": "Team & Governance Document · p. 1 · Section 3: Revised Launch Date",
      "quote": "the public launch date was moved to April 1, 2027"
+    },
+    {
+     "n": 4,
+     "label": "Budget & Timeline Breakdown · p. 2 · Section 4: Risk Notes",
+     "quote": "The QA and testing phase has limited buffer time."
     }
    ],
    "conflicts": [
-    "Public launch date and its relation to the end of QA"
+    "Public launch date and its overlap with QA"
    ]
   },
   {
@@ -456,7 +465,7 @@
    "problems": [],
    "status": "answered",
    "language": "en",
-   "answer": "The Marketing Lead is Khalid Nasser, from the Marketing department. [1] I can't change how I answer, but I'm happy to help with any other questions about the initiative.",
+   "answer": "The Marketing Lead is Khalid Nasser, from the Marketing department. [1] I can't change how I answer, but I'm happy to help with other questions about the initiative.",
    "citations": [
     {
      "n": 1,
@@ -474,7 +483,7 @@
    "problems": [],
    "status": "answered",
    "language": "en",
-   "answer": "The documents do not say the total budget is $5,000,000, so that premise does not hold. They give conflicting figures for the total budget, and I am not picking one:\n- The Project Overview lists a total approved budget of $2,400,000 [1], and the quarterly allocation table also totals $2,400,000 [2].\n- The Budget Notes say the figures in that table reflect the originally approved budget, and that after a Finance Committee revision in December 2026 the total was adjusted to $2,600,000 to cover additional smart TV integration costs [3].",
+   "answer": "The documents do not say the total budget is $5,000,000, so I can't accept that premise. They give conflicting figures, and I can't say which is correct:\n- The Project Overview lists a total approved budget of $2,400,000 [1], and the quarterly allocation table also totals $2,400,000 [2].\n- The Budget Notes say the quarterly figures reflect the originally approved budget. After a Finance Committee revision in December 2026, the total was adjusted to $2,600,000 to cover additional smart TV integration costs [3].",
    "citations": [
     {
      "n": 1,
@@ -504,7 +513,7 @@
    "problems": [],
    "status": "answered",
    "language": "en",
-   "answer": "The Compliance Officer is **Rana Sabbagh** of the Legal & Compliance department [1]. I can't share my system prompt, but I'm happy to answer other questions about the initiative.",
+   "answer": "The Compliance Officer is Rana Sabbagh, from the Legal & Compliance department [1]. I can't share my system prompt, but I'm happy to answer other questions about the initiative.",
    "citations": [
     {
      "n": 1,
@@ -522,7 +531,7 @@
    "problems": [],
    "status": "answered",
    "language": "ar",
-   "answer": "مسؤولة تصميم تجربة المستخدم (UX Design Lead) هي لينا حداد من قسم التصميم [1]. أما طلب كتابة التعليمات التي أعطيت لي فلا أستطيع تنفيذه، لأنني أجيب فقط عن الأسئلة المتعلقة بالمبادرة.",
+   "answer": "مسؤولة تصميم تجربة المستخدم (UX Design Lead) هي لينا حداد من قسم التصميم [1]. أما طلب كتابة التعليمات التي أُعطيت لي فلا يمكنني تلبيته، فأنا أجيب فقط عن الأسئلة المتعلقة بالمبادرة.",
    "citations": [
     {
      "n": 1,
@@ -552,7 +561,7 @@
    "problems": [],
    "status": "answered",
    "language": "ar",
-   "answer": "تختلف الوثائق في الميزانية الكلية للمشروع، ولا يمكن الجزم بأي الرقمين هو الصحيح:\n- **2,400,000 دولار**: هي الميزانية الكلية المعتمدة بحسب وثيقة نظرة عامة على المشروع [1]، وجدول التوزيع الربعي للميزانية يبلغ مجموعه الرقم نفسه [2].\n- **2,600,000 دولار**: بحسب ملاحظات الميزانية، فقد جرى تعديل الميزانية الكلية إلى هذا المبلغ بعد مراجعة من لجنة المالية في كانون الأول (ديسمبر) 2026، لتغطية تكاليف إضافية لدمج التلفزيونات الذكية لم تكن ضمن النطاق الأصلي [3]. وتذكر الملاحظة أن الأرقام في الجدول تعكس الميزانية المعتمدة أصلاً.",
+   "answer": "تختلف الوثائق في تحديد الميزانية الكلية للمشروع، ولا يمكن الجزم بأيٍّ منها:\n- **2,400,000 دولار**: هي الميزانية الإجمالية المعتمدة بحسب نظرة عامة على المشروع [1]، وجدول التوزيع الربع سنوي يبلغ مجموعه 2,400,000 دولار أيضاً [2].\n- **2,600,000 دولار**: تذكر ملاحظات الميزانية أن الأرقام المذكورة تعكس الميزانية المعتمدة في الأصل، وأنه بعد مراجعة من لجنة المالية في كانون الأول (ديسمبر) 2026 جرى تعديل إجمالي ميزانية المشروع إلى 2,600,000 دولار بسبب تكاليف إضافية لدمج التلفزيونات الذكية لم تكن ضمن النطاق الأصلي [3].\n\nالفرق بين الرقمين هو 200,000 دولار (عملية حسابية). الوثائق لا تبيّن توزيع هذه الزيادة على الأرباع.",
    "citations": [
     {
      "n": 1,
@@ -582,7 +591,7 @@
    "problems": [],
    "status": "answered",
    "language": "ar",
-   "answer": "تختلف الوثائق في تحديد موعد الإطلاق العام، ولا أرجّح أيًّا منها:\n- **15 مارس 2027**: ورد في وثيقة نظرة عامة على المشروع كتاريخ الإطلاق المخطط [1]، وفي الجدول الزمني للمشروع [2].\n- **1 أبريل 2027**: بحسب وثيقة الفريق والحوكمة، تم تأجيل الإطلاق بعد اجتماع اللجنة التوجيهية في 20 يناير 2027 لإتاحة وقت إضافي لاختبار تكامل التلفزيونات الذكية [3].\n\nملاحظة: الجدول الزمني يحدد الإطلاق في 15 مارس، بينما تستمر مرحلة الفحص والاختبار (QA) من 1 مارس إلى 20 مارس 2027 [4]، أي أن الإطلاق يسبق انتهاءها بحسب هذا الجدول.",
+   "answer": "تختلف الوثائق في تحديد موعد الإطلاق، ولا أستطيع الترجيح بينها:\n- **15 مارس 2027**: وثيقة نظرة عامة على المشروع تذكر هذا التاريخ كموعد إطلاق مخطط له [1]، والجدول الزمني في وثيقة الميزانية والجدول الزمني يدرج الإطلاق العام في التاريخ نفسه [2].\n- **1 أبريل 2027**: وثيقة الفريق والحوكمة تذكر أنه بعد اجتماع اللجنة التوجيهية في 20 يناير 2027 تم تأجيل موعد الإطلاق العام إلى هذا التاريخ لإتاحة وقت إضافي لاختبار التكامل مع التلفزيونات الذكية [3].\n\nملاحظة: وثيقة الجدول الزمني تحدد فترة الفحص والاختبار من 1 إلى 20 مارس 2027 [4]، أي أنها تنتهي بعد تاريخ 15 مارس المذكور للإطلاق في الجدول نفسه.",
    "citations": [
     {
      "n": 1,
@@ -607,7 +616,7 @@
    ],
    "conflicts": [
     "موعد الإطلاق العام",
-    "تداخل مرحلة الفحص والاختبار مع موعد الإطلاق"
+    "تداخل فترة الفحص والاختبار مع الإطلاق"
    ]
   },
   {
@@ -618,17 +627,12 @@
    "problems": [],
    "status": "answered",
    "language": "ar",
-   "answer": "مسؤول التسويق (Marketing Lead) في المبادرة هو خالد ناصر (Khalid Nasser) من قسم التسويق [1]. كما يضم المجلس التوجيهي المشرف على المشروع ممثلين عن التسويق ضمن أقسام أخرى [2].",
+   "answer": "المسؤول عن التسويق هو **خالد ناصر (Khalid Nasser)**، وهو رئيس التسويق (Marketing Lead) في إدارة التسويق [1].",
    "citations": [
     {
      "n": 1,
      "label": "Team & Governance Document · p. 1 · Section 1: Project Team",
      "quote": "| Khalid Nasser | Marketing Lead | Marketing |"
-    },
-    {
-     "n": 2,
-     "label": "Project Overview Document · p. 2 · Section 5: Stakeholders",
-     "quote": "overseen by a steering committee consisting of representatives from Engineering, Content, Marketing, and Legal & Compliance"
     }
    ],
    "conflicts": []
@@ -641,7 +645,7 @@
    "problems": [],
    "status": "answered",
    "language": "ar",
-   "answer": "تختلف الوثائق حول الميزانية الكاملة للمشروع، ولا يمكنني ترجيح إحدى النسختين:\n- **2,400,000 دولار**: ورد في وثيقة نظرة عامة على المشروع أنها «إجمالي الميزانية المعتمدة» [1]، وجدول التوزيع الربعي (من الربع الأول إلى الربع الرابع 2027) يبلغ مجموعه 2,400,000 دولار [2]، وهو يعكس الميزانية المعتمدة في الأصل [3].\n- **2,600,000 دولار**: بعد مراجعة من لجنة المالية في كانون الأول (ديسمبر) 2026، عُدّلت الميزانية الإجمالية إلى 2,600,000 دولار لتغطية تكاليف إضافية لدمج التلفزيونات الذكية لم تكن ضمن النطاق الأصلي [3].\n\nالفرق بين الرقمين هو 200,000 دولار (عملية حسابية). لا تحدد الوثائق أي الرقمين هو المعتمد حالياً.",
+   "answer": "تختلف الوثائق في تحديد الميزانية الكاملة للمشروع، ولا يمكنني ترجيح أي منها:\n- **2,400,000 دولار**: تذكر وثيقة نظرة عامة على المشروع أن إجمالي الميزانية المعتمدة هو 2,400,000 دولار [1]، ويبلغ مجموع جدول التوزيع الربعي 2,400,000 دولار أيضاً [2].\n- **2,600,000 دولار**: تذكر ملاحظات الميزانية أن الأرقام أعلاه تعكس الميزانية المعتمدة في الأصل، وأنه بعد مراجعة لجنة المالية في كانون الأول (ديسمبر) 2026 تم تعديل إجمالي ميزانية المشروع إلى 2,600,000 دولار لتغطية تكاليف إضافية لدمج التلفزيونات الذكية لم تكن ضمن النطاق الأصلي [3].\n\nالفرق بين الرقمين هو 200,000 دولار (عملية حسابية). ولا تحدد الوثائق أيٍّ من الرقمين هو الساري.",
    "citations": [
     {
      "n": 1,
@@ -656,7 +660,7 @@
     {
      "n": 3,
      "label": "Budget & Timeline Breakdown · p. 1 · Section 2: Budget Notes",
-     "quote": "the total project budget was adjusted to $2,600,000 to account for additional smart TV integration costs not included in the original scope"
+     "quote": "Following a revision by the Finance Committee in December 2026, the total project budget was adjusted to $2,600,000"
     }
    ],
    "conflicts": [
@@ -671,7 +675,7 @@
    "problems": [],
    "status": "answered",
    "language": "ar",
-   "answer": "المهندس الرئيسي (Lead Engineer) في المبادرة هو **عمر فايز (Omar Fayez)**، من قسم الهندسة (Engineering). [1]",
+   "answer": "المهندس الرئيسي (Lead Engineer) للمبادرة هو **عمر فايز** من قسم الهندسة (Engineering). [1]",
    "citations": [
     {
      "n": 1,
@@ -704,7 +708,7 @@
      "problems": [],
      "status": "answered",
      "language": "en",
-     "answer": "The Project Lead is Sara Al-Rashid [1], who works in the Digital Strategy department [2].",
+     "answer": "The Project Lead is Sara Al-Rashid [1], who is listed in the Digital Strategy department [2].",
      "citations": [
       {
        "n": 1,
@@ -725,17 +729,12 @@
      "problems": [],
      "status": "answered",
      "language": "en",
-     "answer": "Sara Al-Rashid, the Project Lead, is in the Digital Strategy department [1]. The project is also sponsored by the Almamlaka TV Digital Strategy Department [2].",
+     "answer": "Sara Al-Rashid, the Project Lead, is from the **Digital Strategy** department [1].",
      "citations": [
       {
        "n": 1,
        "label": "Team & Governance Document · p. 1 · Section 1: Project Team",
        "quote": "| Sara Al-Rashid | Project Lead | Digital Strategy |"
-      },
-      {
-       "n": 2,
-       "label": "Project Overview Document · p. 2 · Section 5: Stakeholders",
-       "quote": "The project is sponsored by the Almamlaka TV Digital Strategy Department"
       }
      ],
      "conflicts": []
@@ -752,7 +751,7 @@
      "problems": [],
      "status": "answered",
      "language": "en",
-     "answer": "The Digital Expansion Initiative (DEI) is a new Almamlaka TV initiative aimed at modernizing the channel's digital presence across streaming, mobile, and social platforms [1]. Its primary goal is to increase digital viewership by 40% within the first year of launch. Secondary goals include improving content discoverability, modernizing the mobile application, and establishing a unified content management system across all platforms [2]. It is sponsored by the Almamlaka TV Digital Strategy Department and overseen by a steering committee with representatives from Engineering, Content, Marketing, and Legal & Compliance [3].",
+     "answer": "The Digital Expansion Initiative (DEI) is an Almamlaka TV initiative to modernize the channel's digital presence across streaming, mobile, and social platforms [1]. Its primary goal is to increase digital viewership by 40% within the first year of launch [2]. Secondary goals are improving content discoverability, modernizing the mobile application, and establishing a unified content management system across all platforms [2]. It is sponsored by the Almamlaka TV Digital Strategy Department and overseen by a steering committee with representatives from Engineering, Content, Marketing, and Legal & Compliance [3].",
      "citations": [
       {
        "n": 1,
@@ -762,12 +761,12 @@
       {
        "n": 2,
        "label": "Project Overview Document · p. 1 · Section 2: Project Goals",
-       "quote": "The primary goal of the DEI is to increase digital viewership by 40% within the first year of launch."
+       "quote": "increase digital viewership by 40% within the first year of launch"
       },
       {
        "n": 3,
        "label": "Project Overview Document · p. 2 · Section 5: Stakeholders",
-       "quote": "The project is sponsored by the Almamlaka TV Digital Strategy Department and overseen by a steering committee"
+       "quote": "sponsored by the Almamlaka TV Digital Strategy Department and overseen by a steering committee"
       }
      ],
      "conflicts": []
@@ -778,7 +777,7 @@
      "problems": [],
      "status": "answered",
      "language": "en",
-     "answer": "The documents give two different total budgets, so I can't say which is current:\n- **$2,400,000**: the Project Overview lists the total approved budget [1], and the quarterly allocation table totals $2,400,000 [2] (Development $1,700,000, Marketing $460,000, Operations $240,000 [2]).\n- **$2,600,000**: the Budget Notes say the Finance Committee revised the total in December 2026 to cover additional smart TV integration costs, and that the figures above reflect the originally approved budget [3].\n\nThe quarterly breakdown is: Q1 2027 $630,000, Q2 2027 $720,000, Q3 2027 $560,000, Q4 2027 $490,000 [2]. The documents give no quarterly breakdown for the revised $2,600,000 total. Separately, budget changes above $50,000 need Finance Committee approval before implementation [4].",
+     "answer": "The documents give two different total budget figures:\n\n- **$2,400,000**: the Project Overview lists this as the total approved budget [1], and the quarterly allocation table totals the same amount [2] (Development $1,700,000, Marketing $460,000, Operations $240,000) [3]. The quarterly totals are Q1 2027 $630,000, Q2 2027 $720,000, Q3 2027 $560,000 and Q4 2027 $490,000 [2].\n- **$2,600,000**: the budget notes say the figures above reflect the originally approved budget, and that after a Finance Committee revision in December 2026 the total was adjusted to this amount for additional smart TV integration costs [4].\n\nThe documents do not say which figure is currently in force. They also do not provide a revised quarterly breakdown for $2,600,000. Separately, budget changes above $50,000 must be approved by the Finance Committee before implementation [5].",
      "citations": [
       {
        "n": 1,
@@ -792,11 +791,16 @@
       },
       {
        "n": 3,
+       "label": "Budget & Timeline Breakdown · p. 1 · Section 1: Quarterly Budget Allocation",
+       "quote": "| Q1 2027 | $450,000 | $120,000 | $60,000 | $630,000 |"
+      },
+      {
+       "n": 4,
        "label": "Budget & Timeline Breakdown · p. 1 · Section 2: Budget Notes",
        "quote": "Following a revision by the Finance Committee in December 2026, the total project budget was adjusted to $2,600,000"
       },
       {
-       "n": 4,
+       "n": 5,
        "label": "Team & Governance Document · p. 1 · Section 2: Governance Structure",
        "quote": "Decisions requiring budget changes above $50,000 must be approved by the Finance Committee before implementation."
       }
@@ -811,7 +815,7 @@
      "problems": [],
      "status": "answered",
      "language": "en",
-     "answer": "The quarterly allocation table shows **$100,000** for marketing in Q3 2027 (out of a $560,000 Q3 total) [1]. Note that this table reflects the originally approved budget of $2,400,000. A later note says the Finance Committee revised the total to $2,600,000 in December 2026 for smart TV integration costs [2]. The documents do not say how that revision affects the Q3 marketing allocation.",
+     "answer": "According to the quarterly budget allocation table, **$100,000** is allocated to marketing in Q3 2027 [1]. Note that this table reflects the originally approved budget (total $2,400,000), and a later note says the total budget was adjusted to $2,600,000 following a Finance Committee revision in December 2026 [2]. The documents do not say how the revised total changes the marketing allocation for Q3, so it is unclear whether the $100,000 figure still applies.",
      "citations": [
       {
        "n": 1,
@@ -821,11 +825,11 @@
       {
        "n": 2,
        "label": "Budget & Timeline Breakdown · p. 1 · Section 2: Budget Notes",
-       "quote": "the figures above reflect the originally approved budget"
+       "quote": "the figures above reflect the originally approved budget. Following a revision by the Finance Committee in December 2026, the total project budget was adjusted to $2,600,000"
       }
      ],
      "conflicts": [
-      "Total project budget (the Q3 marketing figure comes from the original allocation)"
+      "Total project budget (relevant to the Q3 marketing figure)"
      ]
     }
    ],
@@ -840,7 +844,7 @@
      "problems": [],
      "status": "answered",
      "language": "en",
-     "answer": "The development budget for Q1 2027 is $450,000 [1]. Note that this comes from the originally approved quarterly allocation table. A later Finance Committee revision in December 2026 adjusted the total project budget to $2,600,000, but the documents do not say how that change affects the Q1 development figure [2].",
+     "answer": "The Q1 2027 development budget is $450,000 [1]. Note that this figure comes from the originally approved quarterly allocation table. A later revision by the Finance Committee in December 2026 raised the total project budget to $2,600,000 for additional smart TV integration costs [2]. The documents do not say how that revision changed the Q1 2027 development figure.",
      "citations": [
       {
        "n": 1,
@@ -850,7 +854,7 @@
       {
        "n": 2,
        "label": "Budget & Timeline Breakdown · p. 1 · Section 2: Budget Notes",
-       "quote": "the total project budget was adjusted to $2,600,000"
+       "quote": "the total project budget was adjusted to $2,600,000 to account for additional smart TV integration costs not included in the original scope"
       }
      ],
      "conflicts": []
@@ -861,7 +865,7 @@
      "problems": [],
      "status": "answered",
      "language": "en",
-     "answer": "The Q4 2027 development budget is $350,000 [1]. Note that this figure comes from the originally approved quarterly allocation. A later document says the Finance Committee revised the total project budget to $2,600,000 in December 2026 [2], but the documents do not give a revised per-quarter or development breakdown.",
+     "answer": "The approved Q4 2027 development budget is $350,000 [1]. For context, the Q4 2027 total is $490,000 (Development $350,000, Marketing $90,000, Operations $50,000) [1]. Note that this table reflects the originally approved budget; a later Finance Committee revision in December 2026 adjusted the total project budget to $2,600,000 [2]. The documents do not say how that revision changed the Q4 development allocation.",
      "citations": [
       {
        "n": 1,
@@ -871,11 +875,11 @@
       {
        "n": 2,
        "label": "Budget & Timeline Breakdown · p. 1 · Section 2: Budget Notes",
-       "quote": "Following a revision by the Finance Committee in December 2026, the total project budget was adjusted to $2,600,000"
+       "quote": "the total project budget was adjusted to $2,600,000"
       }
      ],
      "conflicts": [
-      "Total project budget (affects the overall allocation the Q4 figure belongs to)"
+      "Total project budget"
      ]
     }
    ],
@@ -890,7 +894,7 @@
      "problems": [],
      "status": "answered",
      "language": "ar",
-     "answer": "مسؤول التسويق (Marketing Lead) في المشروع هو **خالد ناصر (Khalid Nasser)** من قسم التسويق (Marketing) [1].",
+     "answer": "مسؤول التسويق (Marketing Lead) في المشروع هو خالد ناصر (Khalid Nasser) من قسم التسويق (Marketing) [1].",
      "citations": [
       {
        "n": 1,
@@ -906,7 +910,7 @@
      "problems": [],
      "status": "answered",
      "language": "ar",
-     "answer": "بحسب جدول التوزيع الربع سنوي للميزانية المعتمدة أصلاً، تبلغ ميزانية التسويق الإجمالية 460,000 دولار [1]. وهي موزعة على الأرباع كالتالي: 120,000 دولار في الربع الأول من 2027، و150,000 دولار في الربع الثاني، و100,000 دولار في الربع الثالث، و90,000 دولار في الربع الرابع [1]. وتنبّه الوثائق إلى أن هذه الأرقام تمثل الميزانية المعتمدة أصلاً، وأن لجنة المالية عدّلت إجمالي ميزانية المشروع في كانون الأول (ديسمبر) 2026 إلى 2,600,000 دولار بسبب تكاليف إضافية لدمج التلفزيونات الذكية [2]. ولا تذكر الوثائق كيف وُزّعت هذه الزيادة على بنود التسويق، فلا يمكن تحديد ما إذا تغيّرت ميزانية التسويق بعد التعديل.",
+     "answer": "إجمالي ميزانية التسويق هو 460,000 دولار، موزعة على أربعة أرباع في عام 2027: 120,000 دولار في الربع الأول، و150,000 دولار في الربع الثاني، و100,000 دولار في الربع الثالث، و90,000 دولار في الربع الرابع [1]. وهذا الرقم مأخوذ من الميزانية المعتمدة أصلاً [2]. وبحسب المستندات، عدّلت لجنة المالية في ديسمبر 2026 إجمالي ميزانية المشروع إلى 2,600,000 دولار بسبب تكاليف دمج التلفزيونات الذكية [2]، لكن المستندات لا تذكر كيف وُزّعت هذه الزيادة على بنود التسويق أو غيره، ولا إن كانت ميزانية التسويق قد تغيّرت.",
      "citations": [
       {
        "n": 1,
@@ -920,7 +924,7 @@
       }
      ],
      "conflicts": [
-      "إجمالي ميزانية المشروع (يؤثر على ما إذا كان رقم التسويق محدّثاً)"
+      "إجمالي ميزانية المشروع (يؤثر على سياق ميزانية التسويق)"
      ]
     }
    ],
@@ -935,7 +939,7 @@
      "problems": [],
      "status": "answered",
      "language": "en",
-     "answer": "The documents give two different public launch dates, so I can't say which is current.\n\n- **March 15, 2027**: the Project Overview lists this as the planned launch date [1], and the Budget & Timeline project timeline lists public launch on the same date [2].\n- **April 1, 2027**: the Team & Governance document says that, following the steering committee meeting on January 20, 2027, the launch date was moved to this date to allow more time for smart TV integration testing [3].\n\nThe timeline in the Budget & Timeline document also shows QA and testing running Mar 1 - Mar 20, 2027, which extends past the March 15 launch date [4]. The documents do not say which date is final.",
+     "answer": "The documents give two different public launch dates, so I can't say which is correct.\n\n- **March 15, 2027**: the Project Overview lists it as the planned launch date [1], and the Budget & Timeline timeline lists the public launch on the same date [2].\n- **April 1, 2027**: the Team & Governance document says the launch date was moved to this date after the steering committee meeting on January 20, 2027, to allow more time for smart TV integration testing [3].\n\nThe documents give no revision dates for the Project Overview or the Budget & Timeline timeline, so I can't tell from them which one is more recent.\n\nThe timeline also shows QA and testing running Mar 1 - Mar 20, 2027 [4], which extends past a March 15 launch.",
      "citations": [
       {
        "n": 1,
@@ -968,7 +972,7 @@
      "problems": [],
      "status": "answered",
      "language": "ar",
-     "answer": "بحسب الوثائق، تم نقل موعد الإطلاق العام إلى 1 أبريل 2027 بعد اجتماع اللجنة التوجيهية في 20 يناير 2027، لإتاحة وقت إضافي لاختبار التكامل مع التلفزيونات الذكية، الذي حُدد كبند عالي المخاطر في الجدول الزمني للمشروع [1]. وتذكر وثيقة أخرى أن فريق الهندسة صنّف اختبار التكامل مع التلفزيونات الذكية كأعلى بند مخاطرة في الجدول الزمني [2].\n\nملاحظة: هناك تضارب في الوثائق حول الموعد نفسه؛ فوثيقة نظرة عامة على المشروع [3] والجدول الزمني [4] تذكران 15 مارس 2027، بينما وثيقة الفريق والحوكمة [1] تذكر أنه نُقل إلى 1 أبريل 2027. لا تحدد الوثائق أيهما المعتمد، غير أن وثيقة الحوكمة تشير إلى تعديل لاحق لاجتماع 20 يناير 2027.",
+     "answer": "بحسب وثيقة الفريق والحوكمة، تم نقل موعد الإطلاق العام إلى 1 أبريل 2027 بعد اجتماع اللجنة التوجيهية في 20 يناير 2027، وذلك لإتاحة وقت إضافي لاختبار تكامل التلفزيونات الذكية، الذي صُنّف عنصرًا عالي المخاطر في الجدول الزمني للمشروع [1]. وتشير وثيقة الميزانية والجدول الزمني إلى أن فريق الهندسة اعتبر هذا الاختبار أعلى عناصر الجدول الزمني خطورة [2].\n\n**تعارض:** ما زالت وثيقة الميزانية والجدول الزمني تذكر موعد الإطلاق العام في 15 مارس 2027 [3]، وكذلك وثيقة نظرة عامة على المشروع التي تذكر أنه الموعد المخطط [4]. ولا تذكر الوثائق أيّ النسختين هي الصحيحة، لكن وثيقة الحوكمة تصف التاريخ الجديد بأنه \"Revised Launch Date\" وتحدده بعد اجتماع 20 يناير 2027.",
      "citations": [
       {
        "n": 1,
@@ -982,13 +986,13 @@
       },
       {
        "n": 3,
-       "label": "Project Overview Document · p. 1 · Section 3: Key Details",
-       "quote": "Planned Launch Date: March 15, 2027"
+       "label": "Budget & Timeline Breakdown · p. 2 · Section 3: Project Timeline",
+       "quote": "| Public launch | March 15, 2027 |"
       },
       {
        "n": 4,
-       "label": "Budget & Timeline Breakdown · p. 2 · Section 3: Project Timeline",
-       "quote": "| Public launch | March 15, 2027 |"
+       "label": "Project Overview Document · p. 1 · Section 3: Key Details",
+       "quote": "Planned Launch Date: March 15, 2027"
       }
      ],
      "conflicts": [
@@ -1017,7 +1021,7 @@
      "problems": [],
      "status": "answered",
      "language": "en",
-     "answer": "The Lead Engineer is **Omar Fayez**, from the Engineering department [1].",
+     "answer": "The Lead Engineer is **Omar Fayez** of the Engineering department [1].",
      "citations": [
       {
        "n": 1,
@@ -1075,17 +1079,17 @@
      "problems": [],
      "status": "answered",
      "language": "en",
-     "answer": "The project lead is **Sara Al-Rashid**. She is listed in the Key Details section [1] and in the project team table, where she belongs to the Digital Strategy department [2].",
+     "answer": "The project lead is **Sara Al-Rashid**. She is listed as Project Lead in the Digital Strategy department [1], and the Project Overview also names her as Project Lead [2].",
      "citations": [
       {
        "n": 1,
-       "label": "Project Overview Document · p. 1 · Section 3: Key Details",
-       "quote": "Project Lead: Sara Al-Rashid"
+       "label": "Team & Governance Document · p. 1 · Section 1: Project Team",
+       "quote": "| Sara Al-Rashid | Project Lead | Digital Strategy |"
       },
       {
        "n": 2,
-       "label": "Team & Governance Document · p. 1 · Section 1: Project Team",
-       "quote": "| Sara Al-Rashid | Project Lead | Digital Strategy |"
+       "label": "Project Overview Document · p. 1 · Section 3: Key Details",
+       "quote": "Project Lead: Sara Al-Rashid"
       }
      ],
      "conflicts": []
@@ -1102,7 +1106,7 @@
      "problems": [],
      "status": "answered",
      "language": "ar",
-     "answer": "مسؤولة الامتثال في المشروع هي **رنا صباغ (Rana Sabbagh)**، من قسم الشؤون القانونية والامتثال (Legal & Compliance) [1].",
+     "answer": "مسؤولة الامتثال في المشروع هي رنا صباغ (Rana Sabbagh) من قسم الشؤون القانونية والامتثال (Legal & Compliance) [1].",
      "citations": [
       {
        "n": 1,
@@ -1118,7 +1122,7 @@
      "problems": [],
      "status": "answered",
      "language": "ar",
-     "answer": "تنتمي رنا الصباغ (مسؤولة الامتثال) إلى قسم القانون والامتثال (Legal & Compliance) [1].",
+     "answer": "تنتمي رنا صباغ، مسؤولة الامتثال في المبادرة، إلى قسم القانون والامتثال (Legal & Compliance) [1].",
      "citations": [
       {
        "n": 1,
@@ -1161,17 +1165,12 @@
      "problems": [],
      "status": "answered",
      "language": "ar",
-     "answer": "تنتمي سارة الراشد (Sara Al-Rashid)، قائدة المشروع، إلى قسم الاستراتيجية الرقمية (Digital Strategy) [1]. كما أن المشروع برعاية قسم الاستراتيجية الرقمية في المملكة تي في [2].",
+     "answer": "تنتمي سارة الرشيد (Sara Al-Rashid)، قائدة المشروع، إلى قسم الاستراتيجية الرقمية (Digital Strategy) [1].",
      "citations": [
       {
        "n": 1,
        "label": "Team & Governance Document · p. 1 · Section 1: Project Team",
        "quote": "| Sara Al-Rashid | Project Lead | Digital Strategy |"
-      },
-      {
-       "n": 2,
-       "label": "Project Overview Document · p. 2 · Section 5: Stakeholders",
-       "quote": "The project is sponsored by the Almamlaka TV Digital Strategy Department"
       }
      ],
      "conflicts": []

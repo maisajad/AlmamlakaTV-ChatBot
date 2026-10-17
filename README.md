@@ -97,8 +97,9 @@ The bot names those 4 and says the other 8 aren't listed.
 
 ## Evaluation
 
-Latest run: 2026-10-17, Claude Sonnet 5.5 (answers) and Claude Haiku 5.5 (routing). Every eval goes
-through the same pipeline the UI uses. The full results, with every answer, are on the
+Latest run: 2026-10-17, Claude Sonnet 5.5 (answers) and Claude Haiku 5.5 (routing), against both a local
+instance and the live Render deployment, with the same results. Every eval goes through the same
+pipeline the UI uses. The full results, with every answer, are on the
 [quality page](https://almamlaka-assistant-hrj9.onrender.com/quality).
 
 | Eval | Result |
